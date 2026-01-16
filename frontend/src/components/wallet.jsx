@@ -7,9 +7,36 @@ const Wallet = () => {
     const [activeTab, setActiveTab] = useState('balance');
     const [withdrawAmount, setWithdrawAmount] = useState('');
   const { FetchUserData, HandleFetchUserData ,createWithdraw,  withdrawHistory,
-  fetchWithdrawHistory,
+  fetchWithdrawHistory,loading, setloading
 } = useAppContext();
+
+
+  useEffect(() => {
+    
+     HandleFetchUserData();
+  }, [ HandleFetchUserData]);
   // ✅ Fetch once / safe (recommended)
+// ✅ Withdraw fee (10%) + final amount (net)
+const withdrawNum = useMemo(() => Number(withdrawAmount || 0), [withdrawAmount]);
+const user = FetchUserData || {};
+const availableBalance = Number(user.totalEarnings || 0);
+
+const withdrawFee = useMemo(() => {
+  const fee = withdrawNum * 0.10;
+  return Number.isFinite(fee) ? fee : 0;
+}, [withdrawNum]);
+
+const withdrawFinal = useMemo(() => {
+  const net = withdrawNum - withdrawFee;
+  return Number.isFinite(net) ? net : 0;
+}, [withdrawNum, withdrawFee]);
+
+const canWithdraw = useMemo(() => {
+  if (!withdrawAmount) return false;
+  if (withdrawNum < 50) return false; // ✅ your min rule
+  if (withdrawNum > Number(FetchUserData?.totalEarnings || 0)) return false; // ✅ real available
+  return true;
+}, [withdrawAmount, withdrawNum, FetchUserData]);
 
   const maskWallet = (addr = "") => {
   if (!addr) return "—";
@@ -17,29 +44,25 @@ const Wallet = () => {
   return `${addr.slice(0, 4)}••••••••`;
 };
 
-  useEffect(() => {
-    
-     HandleFetchUserData();
-  }, [ HandleFetchUserData]);
 useEffect(() => {
   if (activeTab === "history") {
     fetchWithdrawHistory();
   }
 }, [activeTab, fetchWithdrawHistory]);
 
-    const walletData = {
-        totalBalance: 245.67,
-        totalEarned: 1567.89,
-        pendingWithdrawals: 45.20,
-        availableBalance: 200.47,
-        transactions: [
-            { id: '#TXN001', type: 'Earning', amount: '+12.50', date: '2h ago', status: 'completed' },
-            { id: '#TXN002', type: 'Task Reward', amount: '+25.00', date: '1d ago', status: 'completed' },
-            { id: '#TXN003', type: 'Withdrawal', amount: '-50.00', date: '2d ago', status: 'pending' },
-            { id: '#TXN004', type: 'Daily Bonus', amount: '+8.75', date: '3d ago', status: 'completed' },
-            { id: '#TXN005', type: 'Referral', amount: '+100.00', date: '5d ago', status: 'completed' },
-        ]
-    };
+    // const walletData = {
+    //     totalBalance: 245.67,
+    //     totalEarned: 1567.89,
+    //     pendingWithdrawals: 45.20,
+    //     availableBalance: 200.47,
+    //     transactions: [
+    //         { id: '#TXN001', type: 'Earning', amount: '+12.50', date: '2h ago', status: 'completed' },
+    //         { id: '#TXN002', type: 'Task Reward', amount: '+25.00', date: '1d ago', status: 'completed' },
+    //         { id: '#TXN003', type: 'Withdrawal', amount: '-50.00', date: '2d ago', status: 'pending' },
+    //         { id: '#TXN004', type: 'Daily Bonus', amount: '+8.75', date: '3d ago', status: 'completed' },
+    //         { id: '#TXN005', type: 'Referral', amount: '+100.00', date: '5d ago', status: 'completed' },
+    //     ]
+    // };
 // ✅ Sum of pending + processing withdrawals
 const pendingSum = useMemo(() => {
   const list = Array.isArray(withdrawHistory) ? withdrawHistory : [];
@@ -47,6 +70,16 @@ const pendingSum = useMemo(() => {
     .filter((w) => ["pending", "processing"].includes(String(w.status || "").toLowerCase()))
     .reduce((sum, w) => sum + Number(w.amount || w.amountUSD || 0), 0);
 }, [withdrawHistory]);
+const handleWithdraw = () => {
+  // ✅ backend ko net amount bhejo
+  createWithdraw(withdrawFinal);
+};
+
+if (!FetchUserData) {
+  setloading(true)
+}
+
+
 
     return (
         <div className="min-h-full pt-0 pb-24 bg-gradient-to-br from-slate-900 via-black to-slate-950 text-white">
@@ -69,7 +102,7 @@ const pendingSum = useMemo(() => {
                     className="bg-slate-900/80 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-6 text-center shadow-2xl"
                 >
                     <div className="text-4xl md:text-5xl font-black bg-gradient-to-r from-emerald-400 to-emerald-500 bg-clip-text text-transparent mb-2">
-                        ${FetchUserData.totalEarnings.toFixed(2)}
+${availableBalance.toFixed(2)}
                     </div>
                     <div className="text-slate-400 text-sm uppercase tracking-wider font-semibold">Available Balance</div>
                 </motion.div>
@@ -230,7 +263,7 @@ const pendingSum = useMemo(() => {
             onChange={(e) => setWithdrawAmount(e.target.value)}
             placeholder="Enter amount"
             min="50"
-            max={walletData.availableBalance}
+max={Number(FetchUserData?.totalEarnings || 0)}
             step="0.01"
             className="w-full p-4 bg-slate-900/80 border-2 border-slate-700/50 rounded-2xl text-xl font-bold text-white  focus:border-emerald-500/70 focus:outline-none backdrop-blur-xl transition-all"
           />
@@ -239,19 +272,38 @@ const pendingSum = useMemo(() => {
         {/* QUICK AMOUNTS */}
   
       </div>
+{/* Fee breakdown */}
+<div className="bg-slate-900/60 border border-slate-700/50 rounded-2xl p-4">
+  <div className="flex items-center justify-between text-sm">
+    <span className="text-slate-400 font-semibold">Selected Amount</span>
+    <span className="text-white font-black">${withdrawNum.toFixed(2)}</span>
+  </div>
+
+  <div className="flex items-center justify-between text-sm mt-2">
+    <span className="text-slate-400 font-semibold">Fee (10%)</span>
+    <span className="text-orange-400 font-black">-${withdrawFee.toFixed(2)}</span>
+  </div>
+
+  <div className="h-px bg-slate-700/60 my-3" />
+
+  <div className="flex items-center justify-between">
+    <span className="text-slate-200 font-bold">Final Amount (You Receive)</span>
+    <span className="text-emerald-400 text-xl font-black">${withdrawFinal.toFixed(2)}</span>
+  </div>
+</div>
 
       
 
       {/* WITHDRAW BUTTON */}
       <motion.button
-        onClick={() => createWithdraw(withdrawAmount)}
+onClick={handleWithdraw}
 
         className="w-full py-5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-500 text-slate-900 font-black text-xl rounded-3xl shadow-2xl hover:shadow-emerald-500/50 border-2 border-emerald-400/50 disabled:opacity-50 disabled:cursor-not-allowed"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        disabled={!withdrawAmount || parseFloat(withdrawAmount) > walletData.availableBalance || parseFloat(withdrawAmount) < 5}
+disabled={!canWithdraw}
       >
-        🚀 Withdraw ${withdrawAmount || '0'}
+🚀 Withdraw ${withdrawFinal.toFixed(2)}
       </motion.button>
 
       <div className="mt-6 text-xs text-slate-500 text-center space-y-1">

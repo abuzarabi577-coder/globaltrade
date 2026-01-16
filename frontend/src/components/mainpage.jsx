@@ -408,7 +408,7 @@ Founder’s Syndicate  </span>
     <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }}>
       <div className="relative bg-gradient-to-br from-emerald-500/5 to-teal-500/5 border border-emerald-800/50 rounded-3xl p-6 shadow-2xl overflow-hidden">
         <img 
-          src="/Image/referalimage.webp" 
+          src="/image/referalimage.webp" 
           alt="Referral Earnings Dashboard"
           className="w-full h-80 object-cover rounded-2xl shadow-2xl"
         />
@@ -486,7 +486,232 @@ Founder’s Syndicate  </span>
       </div>
 
       {/* Fixed Bottom Navigation */}
-     
+     {/* ✅ ABOUT SECTION */}
+<section className="bg-black/40 border border-gray-800/60 backdrop-blur-xl rounded-3xl p-6 md:p-10">
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+    {/* LEFT */}
+    <motion.div
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      className="space-y-5"
+    >
+      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-yellow-500/10 border border-yellow-500/25 text-yellow-300 text-xs font-bold uppercase tracking-wider">
+        About 1C Trader
+      </div>
+
+      <h2 className="text-2xl md:text-4xl font-black leading-tight">
+        Built for{" "}
+        <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+          consistent earning
+        </span>{" "}
+        & clean investing.
+      </h2>
+
+      <p className="text-sm md:text-base text-gray-400 leading-relaxed max-w-xl">
+        1C Trader is a professional investing and earning platform designed to
+        keep things simple: choose a plan, complete daily tasks, and track your
+        progress with transparent stats. Our goal is to provide structured market
+        exposure across crypto, oil and AI strategies — with clear dashboards and
+        smooth user experience.
+      </p>
+
+      {/* points */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="bg-black/40 border border-gray-800/60 rounded-2xl p-4">
+          <div className="text-xs text-gray-500 uppercase tracking-wider">
+            Transparent System
+          </div>
+          <div className="text-sm font-bold text-white mt-1">
+            Earnings, ROI & team rewards clearly shown
+          </div>
+        </div>
+
+        <div className="bg-black/40 border border-gray-800/60 rounded-2xl p-4">
+          <div className="text-xs text-gray-500 uppercase tracking-wider">
+            Professional UX
+          </div>
+          <div className="text-sm font-bold text-white mt-1">
+            Clean dashboards + easy investing flow
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-3">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          onClick={() => navigate("/plans#plans")}
+          className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 font-black border border-yellow-500 shadow-lg hover:shadow-yellow-500/30"
+          type="button"
+        >
+          View Plans
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          onClick={() => navigate("/login")}
+          className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-white/5 border border-gray-800/70 text-gray-200 font-black hover:bg-white/10"
+          type="button"
+        >
+          Sign In
+        </motion.button>
+      </div>
+    </motion.div>
+
+    {/* RIGHT */}
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      className="relative"
+    >
+      <div className="relative overflow-hidden rounded-3xl border border-gray-800/60 bg-black/30 p-3">
+        <img
+        src="/image/man-woman-making-deal-work.jpg"
+          alt="About 1C Trader"
+          className="w-full h-72 md:h-96 object-cover rounded-2xl"
+        />
+        <div className="absolute top-5 left-5 bg-black/60 backdrop-blur-xl border border-gray-800/60 rounded-2xl px-4 py-2">
+          <div className="text-[10px] uppercase tracking-wider text-gray-400">
+            Professional Platform
+          </div>
+          <div className="text-sm font-black text-white">1C Trader</div>
+        </div>
+      </div>
+    </motion.div>
+  </div>
+</section>
+
+
+{/* ✅ HAPPY & PROFITABLE PEOPLE SECTION */}
+<section className="bg-gradient-to-r from-gray-900/40 to-black/50 border border-gray-800/60 backdrop-blur-xl rounded-3xl p-6 md:p-10">
+  <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-8">
+    <div>
+      <div className="text-xs uppercase tracking-wider text-gray-500">
+        Community Proof
+      </div>
+      <h2 className="text-2xl md:text-4xl font-black text-white mt-1">
+        Happy people.{" "}
+        <span className="text-yellow-400">Profitable results.</span>
+      </h2>
+      <p className="text-sm md:text-base text-gray-400 mt-2 max-w-2xl">
+        Members are growing with structured investing, daily task consistency and
+        transparent team rewards.
+      </p>
+    </div>
+
+    {/* stats chips */}
+    <div className="grid grid-cols-3 gap-2 w-full md:w-auto">
+      <div className="rounded-2xl border border-gray-800/60 bg-black/40 p-3 text-center">
+        <div className="text-[10px] text-gray-500 uppercase">Daily ROI</div>
+        <div className="text-sm font-black text-green-400">Stable</div>
+      </div>
+      <div className="rounded-2xl border border-gray-800/60 bg-black/40 p-3 text-center">
+        <div className="text-[10px] text-gray-500 uppercase">Dashboard</div>
+        <div className="text-sm font-black text-yellow-300">Clear</div>
+      </div>
+      <div className="rounded-2xl border border-gray-800/60 bg-black/40 p-3 text-center">
+        <div className="text-[10px] text-gray-500 uppercase">Support</div>
+        <div className="text-sm font-black text-white">24/7</div>
+      </div>
+    </div>
+  </div>
+
+  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    {/* image card 1 */}
+    <div className="lg:col-span-1 overflow-hidden rounded-3xl border border-gray-800/60 bg-black/30">
+      <img
+        src="/image/happy-businessman.jpg"
+        alt="Happy people"
+        className="w-full h-56 lg:h-full object-cover"
+      />
+    </div>
+
+    {/* testimonials */}
+    <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+      {[
+        {
+          name: "Elon john",
+          tag: "Consistent daily returns",
+          text: "Dashboard is clean, tasks are simple, and ROI tracking is transparent. I can see my progress daily.",
+          profit: "+$1.8k",
+        },
+        {
+          name: "Sara Malik",
+          tag: "Easy plan system",
+          text: "Plans are clear and the earning flow is smooth. I like the referral structure and team tracking.",
+          profit: "+$42.4k",
+        },
+        {
+          name: "George ",
+          tag: "Professional UI",
+          text: "Everything looks professional. I can check profits and history without confusion.",
+          profit: "+$30.1k",
+        },
+        {
+          name: "Fatima S.",
+          tag: "Team growth",
+          text: "Referral system helped me grow a team. Commissions and stats are always visible.",
+          profit: "+$26.0k",
+        },
+      ].map((t, idx) => (
+        <motion.div
+          key={idx}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          className="bg-black/40 border border-gray-800/60 rounded-3xl p-5"
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="text-sm font-black text-white truncate">{t.name}</div>
+              <div className="text-[11px] text-gray-500 mt-1">{t.tag}</div>
+            </div>
+            <div className="shrink-0 px-3 py-1 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-300 text-xs font-black">
+              {t.profit}
+            </div>
+          </div>
+          <p className="text-sm text-gray-300 mt-4 leading-relaxed">
+            “{t.text}”
+          </p>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+
+  {/* profitable image strip */}
+  <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="rounded-3xl overflow-hidden border border-gray-800/60 bg-black/30">
+      <img
+          src="image/confident-handsome-hispanic-financial-broker-showing-fist-computer-screen-while-trading-from-home.jpg"
+
+        alt="Profitable people"
+        className="w-full h-44 object-cover"
+      />
+    </div>
+
+    <div className="rounded-3xl border border-gray-800/60 bg-black/40 p-5 md:col-span-2">
+      <div className="text-xs uppercase tracking-wider text-gray-500">
+        Why members stay
+      </div>
+      <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="rounded-2xl bg-black/40 border border-gray-800/60 p-4">
+          <div className="text-[10px] text-gray-500 uppercase">Plans</div>
+          <div className="text-sm font-black text-white mt-1">Simple & clear</div>
+        </div>
+        <div className="rounded-2xl bg-black/40 border border-gray-800/60 p-4">
+          <div className="text-[10px] text-gray-500 uppercase">Tasks</div>
+          <div className="text-sm font-black text-white mt-1">Daily routine</div>
+        </div>
+        <div className="rounded-2xl bg-black/40 border border-gray-800/60 p-4">
+          <div className="text-[10px] text-gray-500 uppercase">Rewards</div>
+          <div className="text-sm font-black text-white mt-1">Team + ROI</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
 
 

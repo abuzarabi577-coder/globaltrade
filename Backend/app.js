@@ -20,7 +20,7 @@ connectDB()
 
 app.use(cookieParser());
 app.use(cors({
-  origin: 'https://1cglobal.ch', // Frontend URL
+  origin: 'https://1cglobal.cc', // Frontend URL
   credentials: true // ✅ Cookies allow
 }));
 app.use(express.urlencoded({       // Form data parse
