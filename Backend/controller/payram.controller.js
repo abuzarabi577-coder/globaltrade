@@ -108,97 +108,107 @@ export async function createInvestmentInvoice(req, res) {
 // ✅ Webhook: Always verify by calling PayRam status endpoint (best practice)
 export async function webhookPayram(req, res) {
   try {
-     // Optional: protect endpoint by a shared secret header you set in PayRam (if available)
-    // Example:
-    // const sig = req.headers["x-payram-secret"];
-    // if (process.env.PAYRAM_WEBHOOK_SECRET && sig !== process.env.PAYRAM_WEBHOOK_SECRET) {
-    //   return res.status(401).json({ success: false, message: "Unauthorized webhook" });
-    // }
-    // We don't know exact payload shape from docs, so handle multiple possibilities:
-    const referenceId =
-      req.body?.reference_id ||
-      req.body?.referenceId ||
-      req.body?.data?.reference_id ||
-      req.body?.data?.referenceId;
+    // PayRam GET request bhejta hai, isliye hum params/query check karenge
+    const referenceId = 
+      req.query?.reference_id || 
+      req.body?.reference_id || 
+      req.query?.referenceId
+
 
     if (!referenceId) {
-      // still ack to avoid retries storm
-      return res.json({ success: true, received: true });
+      return res.json({ success: true, message: "No referenceId found" });
     }
 
     const invoice = await InvestmentInvoice.findOne({ referenceId });
-    if (!invoice) return res.json({ success: true, received: true });
+    if (!invoice) return res.json({ success: true, message: "Invoice not found" });
 
-    // Verify from PayRam directly
+    // Verify from PayRam directly (Best practice)
     const statusResp = await getPayramPaymentStatus(referenceId);
 
-    // You must map status depending on PayRam response.
-    // We'll treat "Complete/Confirmed/Paid" as confirmed.
-   const rawStatus = String(statusResp?.status || statusResp?.data?.status || "").toLowerCase();
-const isConfirmed =
-  rawStatus.includes("complete") ||
-  rawStatus.includes("confirm") ||
-  rawStatus.includes("paid") ||
-  rawStatus.includes("success") ||
-  rawStatus.includes("done") ||
-  rawStatus.includes("finish");
+    // ✅ DOCS FIX: PayRam uses 'FILLED' for successful payments
+    const paymentState = statusResp?.paymentState || statusResp?.status;
+    
+    const isConfirmed = 
+      paymentState === "FILLED" || 
+      paymentState === "OVER_FILLED";
 
- if (isConfirmed && invoice.status !== "confirmed") {
-  invoice.status = "confirmed";
-  invoice.confirmedAt = new Date();
-  invoice.payramSnapshot = { ...invoice.payramSnapshot, statusResp };
-  await invoice.save();
-//console.log("WEBHOOK HIT:", req.body);
-//console.log("referenceId:", referenceId);
-//console.log("PayRam statusResp:", statusResp);
-
-  // ✅ add this
-  await activatePlanFromInvoice(invoice);
-}
-
-
-
-    return res.json({ success: true });
- } catch (e) {
-  //console.error("❌ webhookPayram error:", e);
-  return res.json({ success: true, error: e.message });
-}
-
-}
-
-// ✅ Polling endpoint for UI button: "I have paid"
-export async function checkInvoiceStatus(req, res) {
-  try {
-    const userId = req.userId || req.user?._id
-    const { referenceId } = req.params;
-
-    const invoice = await InvestmentInvoice.findOne({ referenceId, userId });
-    if (!invoice) return res.status(404).json({ success: false, message: "Invoice not found" });
-
-    const statusResp = await getPayramPaymentStatus(referenceId);
-  const rawStatus = String(statusResp?.status || statusResp?.data?.status || "").toLowerCase();
-const isConfirmed =
-  rawStatus.includes("complete") ||
-  rawStatus.includes("confirm") ||
-  rawStatus.includes("paid") ||
-  rawStatus.includes("success") ||
-  rawStatus.includes("done") ||
-  rawStatus.includes("finish");
-
-    if (isConfirmed && invoice.status !== "confirme") {
+    if (isConfirmed && invoice.status !== "confirmed") {
       invoice.status = "confirmed";
       invoice.confirmedAt = new Date();
       invoice.payramSnapshot = { ...invoice.payramSnapshot, statusResp };
       await invoice.save();
+
+      // Plan activate karein
+      await activatePlanFromInvoice(invoice);
     }
 
+    return res.json({ success: true });
+  } catch (e) {
+    return res.json({ success: true, error: e.message });
+  }
+}
+// ✅ Polling endpoint for UI button: "I have paid"
+// ✅ Polling fix for "I have paid" button
+// ✅ Polling endpoint: User manually clicks "I have paid"
+export async function checkInvoiceStatus(req, res) {
+  try {
+    const userId = req.userId || req.user?._id;
+    const { referenceId } = req.params;
+
+    // 1. Database se invoice nikalein aur ensure karein ke ye isi user ki hai
+    const invoice = await InvestmentInvoice.findOne({ referenceId, userId });
+    
+    if (!invoice) {
+      return res.status(404).json({ success: false, message: "Invoice not found or unauthorized" });
+    }
+
+    // Agar invoice already confirmed hai, toh dobara API call karne ki zaroorat nahi
+    if (invoice.status === "confirmed") {
+      return res.json({
+        success: true,
+        status: "confirmed",
+        message: "Plan is already active"
+      });
+    }
+
+    // 2. PayRam API se live status check karein
+    const statusResp = await getPayramPaymentStatus(referenceId);
+    
+    // PayRam docs ke mutabiq paymentState check karein
+    const paymentState = statusResp?.paymentState || statusResp?.status;
+
+    // 3. Agar payment FILLED hai toh plan activate karein
+    const isConfirmed = paymentState === "FILLED" || paymentState === "OVER_FILLED";
+
+    if (isConfirmed) {
+      invoice.status = "confirmed";
+      invoice.confirmedAt = new Date();
+      invoice.payramSnapshot = { ...invoice.payramSnapshot, pollingUpdate: statusResp };
+      
+      await invoice.save();
+      
+      // ✅ Plan activation trigger
+      await activatePlanFromInvoice(invoice);
+
+      return res.json({
+        success: true,
+        status: "confirmed",
+        payramStatus: paymentState,
+        message: "Payment verified and plan activated!"
+      });
+    }
+
+    // 4. Agar abhi tak payment nahi mili
     return res.json({
       success: true,
-      status: invoice.status,
-      payramStatus: statusResp?.status || statusResp?.data?.status || null,
+      status: invoice.status, // will be 'pending'
+      payramStatus: paymentState,
+      message: "Payment not detected yet. Please wait for blockchain confirmations."
     });
+
   } catch (e) {
-    return res.status(500).json({ success: false, message: e.message });
+    console.error("❌ Polling Error:", e.message);
+    return res.status(500).json({ success: false, message: "Internal server error during status check" });
   }
 }
 export async function getLatestInvoice(req, res) {

@@ -16,6 +16,8 @@ router.post("/create-invoice", authMiddleware, createInvestmentInvoice);
 
 // PayRam webhook hits here
 router.post("/webhook", webhookPayram);
+router.get("/webhook", webhookPayram);
+router.get("/havepaid",authMiddleware, checkInvoiceStatus);
 
 // optional: polling endpoint
 

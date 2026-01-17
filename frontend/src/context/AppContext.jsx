@@ -69,7 +69,9 @@ const [withdrawHistory, setWithdrawHistory] = useState([]);
         showAlert('success', result.message || 'Tasks saved successfully!');
         return true;
       } else {
-        showAlert('error', result.message || 'Sync failed!');
+      setloading(false)
+
+        showAlert('error', result.message || 'Tasks failed!');
         return false;
       }
     } catch (error) {
@@ -391,15 +393,43 @@ const fetchWithdrawHistory = useCallback(async () => {
   }
 }, [backendURL]);
 
+// AppContext.jsx mein ye function add karein
+const checkInvoiceStatus = async (referenceId) => {
+  try {
+    setloading(true);
+    const res = await fetch(`${backendURL}/api/payram/invoice/${referenceId}`, {
+      method: "GET",
+      credentials: "include",
+    });
+    const data = await res.json();
+    setloading(false);
+
+    if (data.success) {
+      if (data.status === "confirmed") {
+        showAlert("success", "Payment confirmed! Plan activated.");
+        await HandleFetchUserData(); // Refresh dashboard data
+      } else {
+        showAlert("error", "Payment not detected yet. Please wait.");
+      }
+      return data;
+    }
+    return null;
+  } catch (e) {
+    setloading(false);
+    showAlert("error", "Network error checking status");
+    return null;
+  }
+};
+
 
   return (
     <AppContext.Provider value={{
       syncTasksToBackend,    // ✅ Main function
       alert,
       showAlert,saveAdminTasks,
-      HandleFetchAdminTasks,FetchAdminTasks,
+      HandleFetchAdminTasks,FetchAdminTasks,loading, setloading,
       updateAdminTask,deleteAdminTask,HandleFetchUserTasks,FetchUserTask,fetchTodayTaskStatus,FetchUserData,HandleFetchUserData,HandleCreateInvestmentPlan
-      ,loading,PaymentINV,fetchLatestInvoice,createWithdraw,fetchWithdrawHistory,withdrawHistory
+      ,loading,PaymentINV,fetchLatestInvoice,createWithdraw,fetchWithdrawHistory,withdrawHistory,checkInvoiceStatus
     }}>
       {children}
     </AppContext.Provider>

@@ -19,7 +19,6 @@ const investmentInvoiceSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["pending", "confirmed", "failed", "expired"],
       default: "pending",
       index: true,
     },

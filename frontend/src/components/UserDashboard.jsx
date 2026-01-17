@@ -23,7 +23,7 @@ import Wallet from "./wallet";
 
 export default function UserDashboard({ me }) {
   const navigate = useNavigate();
-  const { FetchUserData, HandleFetchUserData ,showAlert ,alert} = useAppContext();
+  const { FetchUserData, HandleFetchUserData ,showAlert ,loading,PaymentINV,alert,fetchLatestInvoice,checkInvoiceStatus} = useAppContext();
 //console.log(FetchUserData);
   const location = useLocation();
   const [showPlans, setShowPlans] = useState(false); // ✅ toggle
@@ -84,6 +84,25 @@ const PLAN_LABELS = {
   plan3: "Founder’s Syndicate",
 };
 const [showWallet, setShowWallet] = useState(false);
+
+
+
+
+
+// Dashboard load hote hi latest invoice check karein
+  useEffect(() => {
+    fetchLatestInvoice();
+  }, []);
+
+  // Button handler
+  const handleVerifyPayment = async () => {
+    if (PaymentINV?.referenceId) {
+      await checkInvoiceStatus(PaymentINV.referenceId);
+    }
+  };
+
+
+
 
   const quickActions = useMemo(
     () => [
@@ -254,7 +273,17 @@ if (showWallet) {
               Invest Now <FaArrowRight className="inline ml-2" />
             </motion.button>
             }
-
+{PaymentINV && PaymentINV.status === "pending" && (
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            disabled={loading}
+            onClick={handleVerifyPayment}
+            className="px-6 py-3 rounded-2xl bg-green-600 text-white font-black border border-green-500 shadow-lg shadow-green-500/20"
+          >
+            {loading ? "Checking..." : "I have paid"}
+          </motion.button>
+        )}
             
           </div>
         </div>

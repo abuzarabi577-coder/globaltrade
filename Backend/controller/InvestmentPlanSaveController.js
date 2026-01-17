@@ -11,17 +11,16 @@ const getDayKeyUTC = () => new Date().toISOString().slice(0, 10);
 
 export async function activatePlanFromInvoice(invoiceDoc) {
   const userId = invoiceDoc.userId;
-const planKey = String(name).toLowerCase().trim();
+const name = String(invoiceDoc.plan.name).toLowerCase().trim();
   const amountUSD = Number(invoiceDoc.plan?.amountUSD);
   const dailyROIPct = Number(invoiceDoc.plan?.dailyROIPct);
 
-  const cfg = PLAN_CONFIG[planKey];
-  if (!cfg) throw new Error("Invalid plan name in invoice");
+  // if (!cfg) throw new Error("Invalid plan name in invoice");
 
-  // amount strict check (important)
-  if (!Number.isFinite(amountUSD) || amountUSD < cfg.min || amountUSD > cfg.max) {
-    throw new Error("Invoice amount does not match plan config");
-  }
+  // // amount strict check (important)
+  // if (!Number.isFinite(amountUSD) || amountUSD < cfg.min || amountUSD > cfg.max) {
+  //   throw new Error("Invoice amount does not match plan config");
+  // }
 
   const user = await User.findById(userId);
   if (!user) throw new Error("User not found");
@@ -38,7 +37,7 @@ const planKey = String(name).toLowerCase().trim();
   user.activePlan.push({
     date: getDayKeyUTC(),
     plan: {
-      name: planKey,                 // keep key
+      name  ,          // keep key
       amount: amountUSD,             // principal
       dailyROIPct: dailyROIPct,  // ✅ correct ROI
       totalProfit: 0,
@@ -49,7 +48,7 @@ const planKey = String(name).toLowerCase().trim();
 
       // ✅ snapshots for correct cap logic
       startTotalEarnings: Number(user.totalEarnings || 0),
-      multiplierAtStart: multiplier,
+      // multiplierAtStart: multiplier,
       // ✅ store invoice trace
       referenceId: invoiceDoc.referenceId,
       network: invoiceDoc.blockchainCurrency, // ETH / TRX / BASE
