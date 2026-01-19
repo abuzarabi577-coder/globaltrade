@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   const [alert, setAlert] = useState({ isOpen: false, type: "", message: "" });
 
   const navigate = useNavigate();
-  const backendURL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+  const backendURL = "http://localhost:5000";
 
   const [mode, setMode] = useState("login");
   const [isLoggedIn, setIsLoggedIn] = useState(false);

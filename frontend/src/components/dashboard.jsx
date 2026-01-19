@@ -175,7 +175,7 @@ const goToPage = async (page) => {
         {currentPage === "home" && <Mainpage />}
         {currentPage === "tasks" && <TasksSection />}
         {currentPage === "wallet" && <Wallet />}
-     
+     t
         
       </>
     )}

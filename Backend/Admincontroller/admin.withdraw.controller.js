@@ -22,7 +22,6 @@ export async function adminFetchWithdraws(req, res) {
 // ✅ Approve + send payout to PayRam
 export async function adminApproveWithdraw(req, res) {
   try {
-    // const adminId = req.userId || req.user?._id;
     const { id } = req.params;
 
     // 1) Load request
@@ -33,71 +32,67 @@ export async function adminApproveWithdraw(req, res) {
       return res.status(400).json({ success: false, message: `Already processed: ${wr.status}` });
     }
 
-    // 2) Load user (wallet + network profile se)
-    const user=  await User.findById(wr.userId).select("email walletAddress network totalEarnings");
+    // 2) Load user
+    const user = await User.findById(wr.userId); 
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     if (!user.walletAddress || !user.network) {
       return res.status(400).json({ success: false, message: "User wallet/network not set" });
     }
 
-    const amount = Number(wr.amount);
-    if (!Number.isFinite(amount) || amount <= 0) {
-      return res.status(400).json({ success: false, message: "Invalid withdraw amount" });
-    }
+    const amount = Number(wr.amountUSD);
 
-    // 3) Optional balance check
+    // 3) Balance check
     if (Number(user.totalEarnings) < amount) {
       return res.status(400).json({ success: false, message: "Insufficient user balance" });
     }
 
     // 4) LOCK the request
     wr.status = "processing";
-    // wr.adminId = adminId;
     await wr.save();
 
-    // 5) Call PayRam payout API (docs keys EXACT!)
-    const payoutPayload = {
+    // 5) PayRam Payload (Docs ke mutabiq fix kiya)
+ // PayRam ko "ERC20" nahi, "ETH" chahiye
+const payoutPayload = {
   email: String(user.email).trim().toLowerCase(),
-        blockChainCode: String(user.network).toUpperCase(), // ETH/TRX/BASE
-      currencyCode: "USDT",
-      amount: String(amount), // docs: "100000" (string ok)
-      toAddress: user.walletAddress,
-      customerID: String(user._id),
-      // optional:
-      // mobileNumber: "",
-      // residentialAddress: "",
-    };
+  blockChainCode: user.network === "ERC20" ? "ETH" : (user.network === "TRC20" ? "TRX" : user.network), 
+  currencyCode: "USDT",
+  amount: String(amount),
+  toAddress: user.walletAddress,
+  customerID: String(user._id),
+};
 
     const payoutResp = await createPayramWithdrawal(payoutPayload);
 
-    // 6) Save PayRam response
-    wr.status = payoutResp?.status || "pending-approval";
+    // 6) Save PayRam response & Update Status
+    wr.status = payoutResp?.status || "pending";
     wr.payramPayoutId = payoutResp?.id || null;
     wr.payramSnapshot = payoutResp;
     await wr.save();
 
-    // 7) Deduct user balance ONLY if payout accepted by PayRam (id exists)
-    // (Best practice: deduct immediately after PayRam creates payout request)
-    if (wr.payramPayoutId) {
-      await User.updateOne({ _id: wr.userId }, { $inc: { totalEarnings: -amount } });
+    // 7) Deduct user balance & Update Stats
+    if (payoutResp.status=== 'processed') {
+      user.totalEarnings -= wr.amount;
+      
+      // Safety check: Agar field exist nahi karti to initialize karein
+   
+      user.WithdrwalAmt += amount;
+      await user.save(); // ✅ Fixed syntax
     }
-user.WithdrwalAmt += wr.amount
-user.save
+
     return res.json({
       success: true,
-      message: "Withdraw sent to PayRam",
+      message: "Withdraw sent ",
       withdraw: wr,
       payram: payoutResp,
     });
-  } catch (e) {
-    //console.error("adminApproveWithdraw error:", e);
 
-    // If PayRam failed after setting "processing", mark it failed so admin can retry
-    try {
-      const { id } = req.params;
-      await WithdrawRequest.findByIdAndUpdate(id, { $set: { status: "failed" } });
-    } catch (_) {}
+  } catch (e) {
+    console.error("CRASH ERROR:", e.message);
+    // Request reset so admin can try again
+    // try {
+    //   await WithdrawRequest.findByIdAndUpdate(req.params.id, { $set: { status: "failed" } });
+    // } catch (_) {}
 
     return res.status(500).json({ success: false, message: e.message });
   }

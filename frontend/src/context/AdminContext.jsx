@@ -279,7 +279,32 @@ const createDummyUser = useCallback(async (payload) => {
     }
   }, []);
 
+const toggleUserStatus = useCallback(async (userId, currentStatus) => {
+  try {
+    setAdminLoading(true);
+    // Backend endpoint assumes a toggle or specific path
+    const res = await fetch(`${backendURL}/api/admin/users/${userId}/toggle-status`, {
+      method: "PATCH", // Ya POST jo aapke backend par set ho
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isActive: !currentStatus }),
+    });
 
+    const data = await res.json();
+    if (!res.ok || !data?.success) {
+      throw new Error(data?.message || "Failed to update status");
+    }
+
+    showAlert("success", `User ${!currentStatus ? 'Activated' : 'Suspended'} successfully`);
+    await fetchUsers(""); // Refresh the list
+    return true;
+  } catch (e) {
+    showAlert("error", e.message || "Operation failed");
+    return false;
+  } finally {
+    setAdminLoading(false);
+  }
+}, [fetchUsers]);
   const value = useMemo(
     () => ({
       // users
@@ -301,7 +326,7 @@ fetchWithdrawRequests, approveWithdrawRequest, rejectWithdrawRequest,withdraws,
       fetchLeaderboard,createDummyUser,adminUser,
 checkAdminSession,
 loginAdmin,
-logoutAdmin,
+logoutAdmin,toggleUserStatus
 
     }),
     [
@@ -315,7 +340,7 @@ logoutAdmin,
       adminLoading,
       leaderboardUsers,
       leaderboardError,
-      fetchLeaderboard,
+      fetchLeaderboard,showAlert,alert
     ]
   );
 

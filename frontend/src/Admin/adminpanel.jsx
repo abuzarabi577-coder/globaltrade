@@ -23,7 +23,7 @@ const AdminLayout = () => {
     { id: 'users', icon: FaUsers, label: 'Users', path: '/1cglobal_admin_hoon_yaar/users' },
     { id: 'leaderboard', icon: FaTrophy, label: 'Leaderboard', path: '/1cglobal_admin_hoon_yaar/leaderboard' },
     { id: 'tasks', icon: FaTasks, label: 'Tasks', path: '/1cglobal_admin_hoon_yaar/tasksmanage' },
-    { id: 'Withdraws', icon: FaWallet, label: 'Withdraws', path: '/1cglobal_admin_hoon_yaar/withdraws' },
+    { id: 'withdrawal', icon: FaWallet, label: 'withdrawal', path: '/1cglobal_admin_hoon_yaar/withdraws' },
   ];
 
   // 🔥 1C TRADER LOGO - DOT REMOVED

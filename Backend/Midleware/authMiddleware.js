@@ -10,8 +10,8 @@ const authMiddleware = async (req, res, next) => {
 
 const decoded = jwt.verify(token, process.env.JWT_SECRET);
  const user = await User.findById(decoded.userId).select(
-      "_id name email walletAddress  network totalEarnings TotalPoints Referal referralCode dailyTasksCompleted  isActivePlan activePlan  earnings isActive Join level"
-    ).populate("Referal.userId", "name level earnings");;   
+      "_id name email walletAddress  network totalEarnings WithdrwalAmt TotalPoints Referal referralCode dailyTasksCompleted  isActivePlan activePlan  earnings isActive Join level"
+    ).populate("Referal.userId", "name level earnings ");;   
      if (!user) {
       return res.status(401).json({ success: false, message: "Invalid user" });
     }

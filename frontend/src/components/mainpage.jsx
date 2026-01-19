@@ -70,12 +70,6 @@ useEffect(() => {
           <>
             {/* ✅ yahan aap apna existing hero + marketing sections paste kar do */}
             {/* ... */}
-        
-
-
-
-
-
         {/* 1. Hero Section */}
     {/* 1. Hero Section */}
 <section className="min-h-[80vh] flex items-start md:items-center pt-6 md:pt-10">
@@ -480,13 +474,6 @@ Founder’s Syndicate  </span>
     <div id="plans">
       {(!isLoggedIn || isPlansRoute) && <InvestPlanCards />}
     </div>
-
-  </>
-        )}
-      </div>
-
-      {/* Fixed Bottom Navigation */}
-     {/* ✅ ABOUT SECTION */}
 <section className="bg-black/40 border border-gray-800/60 backdrop-blur-xl rounded-3xl p-6 md:p-10">
   <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
     {/* LEFT */}
@@ -711,6 +698,16 @@ Founder’s Syndicate  </span>
     </div>
   </div>
 </section>
+  </>
+        
+        
+        
+        )}
+      </div>
+
+      {/* Fixed Bottom Navigation */}
+     {/* ✅ ABOUT SECTION */}
+
 
 
 
@@ -720,7 +717,7 @@ Founder’s Syndicate  </span>
     {/* Brand */}
     <div>
       <div className="text-xl font-black text-white">
-        1C{" "}
+        1C Global{" "}
         <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
           TRADER
         </span>
@@ -787,7 +784,7 @@ Founder’s Syndicate  </span>
   <div className="border-t border-gray-800/60">
     <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
       <div className="text-xs text-gray-500">
-        © {new Date().getFullYear()} 1C Trader. All rights reserved.
+        © {new Date().getFullYear()} 1C Global Trader. All rights reserved.
       </div>
 
       <div className="flex items-center gap-4 text-xs">

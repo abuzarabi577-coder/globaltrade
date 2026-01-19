@@ -1,8 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaEye, FaTimes, FaSearch, FaPlus } from "react-icons/fa";
 import { useAdmin } from "../context/AdminContext";
-
+import { 
+  FaEye, 
+  FaTimes, 
+  FaSearch, 
+  FaPlus, 
+  FaUserSlash, 
+  FaUserCheck, 
+  FaCheck, 
+  FaBan 
+} from "react-icons/fa";
+import Alert from "../components/Alert";
 const money = (n) => {
   const num = Number(n || 0);
   return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(num);
@@ -17,7 +26,7 @@ export default function AdminUsers() {
     selectedUser,
     setSelectedUser,
     selectedLoading,
-    fetchUserDetails,createDummyUser 
+    fetchUserDetails,createDummyUser ,toggleUserStatus,showAlert,alert
   } = useAdmin();
 
   const [search, setSearch] = useState("");
@@ -38,13 +47,23 @@ export default function AdminUsers() {
 });
 
   const [dummyError, setDummyError] = useState("");
-
+const [confirmModal, setConfirmModal] = useState({ isOpen: false, userId: null, currentStatus: null, name: "" });
   useEffect(() => {
     fetchUsers(""); // initial
   }, [fetchUsers]);
 
- 
-
+ const handleToggleClick = (u) => {
+    setConfirmModal({
+      isOpen: true,
+      userId: u._id,
+      currentStatus: u.isActive,
+      name: u.name
+    });
+  };
+const confirmToggle = async () => {
+    const success = await toggleUserStatus(confirmModal.userId, confirmModal.currentStatus);
+    if (success) setConfirmModal({ ...confirmModal, isOpen: false });
+  };
   // ✅ Client-side filter
   const filtered = useMemo(() => {
   const s = search.trim().toLowerCase();
@@ -113,6 +132,12 @@ const saveDummyUser = async () => {
 
   return (
     <div className="max-w-7xl mx-auto pt-16">
+       <Alert
+                        type={alert.type} 
+                        message={alert.message} 
+                        isOpen={alert.isOpen}
+                        onClose={() => showAlert({ isOpen: false, type: '', message: '' })}
+                      />
       {/* Header */}
       <div className="flex items-end justify-between gap-6 mb-8">
         <div>
@@ -235,17 +260,30 @@ Total: <span className="text-white font-bold">{(users || []).length}</span>
                     </span>
                   </td>
 
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => openUser(u)}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-black/50 border border-gray-800/60 text-gray-200 hover:border-yellow-500/40 hover:text-yellow-300 transition"
-                      title="View details"
-                      type="button"
-                    >
-                      <FaEye />
-                      <span className="hidden sm:inline">View</span>
-                    </button>
-                  </td>
+              <td className="px-6 py-4 text-right">
+        <div className="flex items-center justify-end gap-2">
+          {/* Status Toggle Button */}
+          <button
+            onClick={() => handleToggleClick(u)}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition border ${
+              u.isActive 
+              ? "bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500 hover:text-white" 
+              : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white"
+            }`}
+            title={u.isActive ? "Suspend User" : "Activate User"}
+          >
+            {u.isActive ? <FaUserSlash /> : <FaUserCheck />}
+          </button>
+
+          {/* View Button */}
+          <button
+            onClick={() => openUser(u)}
+            className="w-10 h-10 rounded-xl bg-black/50 border border-gray-800/60 text-gray-200 hover:border-yellow-500/40 hover:text-yellow-300 transition flex items-center justify-center"
+          >
+            <FaEye />
+          </button>
+        </div>
+      </td>
                 </tr>
               ))}
             </tbody>
@@ -518,12 +556,38 @@ Total: <span className="text-white font-bold">{(users || []).length}</span>
                     
                      </div>
      
-                     
+             
                    </div>
                  </motion.aside>
                </>
              )}
            </AnimatePresence>
+                   <AnimatePresence>
+        {confirmModal.isOpen && (
+          <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-[#111] border border-gray-800 p-8 rounded-3xl max-w-sm w-full shadow-2xl text-center"
+            >
+              <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl ${confirmModal.currentStatus ? 'bg-red-500/20 text-red-500' : 'bg-emerald-500/20 text-emerald-500'}`}>
+                {confirmModal.currentStatus ? <FaBan /> : <FaCheck />}
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Are you sure?</h3>
+              <p className="text-gray-400 text-sm mb-6">
+                You are about to <span className="font-bold text-white">{confirmModal.currentStatus ? 'Suspend' : 'Activate'}</span> {confirmModal.name}.
+              </p>
+              <div className="flex gap-3">
+                <button onClick={() => setConfirmModal({ ...confirmModal, isOpen: false })} className="flex-1 py-3 rounded-xl bg-gray-800 text-white font-bold">Cancel</button>
+                <button onClick={confirmToggle} className={`flex-1 py-3 rounded-xl font-black text-black ${confirmModal.currentStatus ? 'bg-red-500' : 'bg-emerald-500'}`}>
+                  Confirm
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

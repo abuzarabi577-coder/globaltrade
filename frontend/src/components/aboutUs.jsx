@@ -18,8 +18,8 @@ const fadeUp = {
   show: { opacity: 1, y: 0 },
 };
 
-export default function AboutUs() {
-  const navigate = useNavigate();
+ export default function AboutUs() {
+ const navigate = useNavigate();
 
   return (
 
@@ -42,7 +42,7 @@ export default function AboutUs() {
           <div className="p-8 md:p-12 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div className="space-y-5">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-300 text-xs font-bold">
-                About 1C TRADER
+                About 1C Global TRADER
               </div>
 
               <h1 className="text-3xl md:text-5xl font-black leading-tight">
@@ -308,9 +308,139 @@ export default function AboutUs() {
     </div>
   </div>
 </motion.section>
+{/* TEAM SECTION */}
+        <motion.section
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.25 }}
+          className="relative"
+        >
+          <div className="text-center space-y-3 mb-12">
+            <div className="text-xs uppercase tracking-wider text-yellow-500 font-bold">Expert Minds</div>
+            <h2 className="text-3xl md:text-4xl font-black text-white">Meet Our Team</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              Behind 1C Global TRADER is a dedicated team of analysts, developers, and support specialists.
+            </p>
+          </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            <TeamCard 
+              name="Alex Rivera" 
+              role="Chief Strategist" 
+              img="image/Alex Rivera.avif" 
+            />
+            <TeamCard 
+              name="Sarah Chen" 
+              role="Lead Developer" 
+              img="image/Sarah Chen.avif" 
+            />
+            <TeamCard 
+              name="Marcus Thorne" 
+              role="Risk Analyst" 
+              img="image/Marcus Thorne.avif" 
+            />
+            <TeamCard 
+              name="Elena Petrova" 
+              role="Operations Head" 
+              img="image/Elena Petrova.avif" 
+            />
+            <TeamCard 
+              name="David Smith" 
+              role="Support Lead" 
+              img="image/David Smith.avif" 
+            />
+          </div>
+        </motion.section>
       </div>
+      <footer className="w-full border-t border-gray-800/60 bg-black/40 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-10">
+          {/* Brand */}
+          <div>
+            <div className="text-xl font-black text-white">
+              1C Global{" "}
+              <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                TRADER
+              </span>
+            </div>
+            <p className="text-sm text-gray-400 mt-3 leading-relaxed max-w-xs">
+              Professional investing & earning platform with transparent rewards, clean dashboards,
+              and daily progress tracking.
+            </p>
+      
+           
+          </div>
+      
+          {/* Quick Links */}
+          <div>
+            <div className="text-xs uppercase tracking-wider text-gray-500 mb-4">Quick Links</div>
+            <div className="space-y-2 text-sm">
+              <Link className="text-gray-300 hover:text-yellow-400 transition" to="/plans">
+                Plans
+              </Link>
+              <div />
+              <Link className="text-gray-300 hover:text-yellow-400 transition" to="/login">
+                Login
+              </Link>
+              <div />
+              <Link className="text-gray-300 hover:text-yellow-400 transition" to="/">
+                Dashboard
+              </Link>
+            </div>
+          </div>
+      
+          {/* Resources */}
+          <div>
+            <div className="text-xs uppercase tracking-wider text-gray-500 mb-4">Resources</div>
+            <div className="space-y-2 text-sm text-gray-300">
+              <button
+                onClick={() => document.getElementById("plans")?.scrollIntoView({ behavior: "smooth" })}
+                className="text-left hover:text-yellow-400 transition"
+                type="button"
+              >
+                Start Investing
+              </button>
+              <div />
+              <a className="hover:text-yellow-400 transition" href="#">
+                Help Center
+              </a>
+              <div />
+              <a className="hover:text-yellow-400 transition" href="#">
+                FAQ
+              </a>
+            </div>
+          </div>
+      
+          {/* Community */}
+         
+      
+            <div className="mt-4 bg-black/30 border border-gray-800/60 rounded-2xl p-4">
+              <div className="text-xs uppercase tracking-wider text-gray-500">Support</div>
+              <div className="text-sm text-gray-300 mt-1">support@1cglobal.ch</div>
+              <div className="text-xs text-gray-500 mt-1">Response within 24 hours</div>
+            </div>
+          </div>
+        
+      
+        <div className="border-t border-gray-800/60">
+          <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
+            <div className="text-xs text-gray-500">
+              © {new Date().getFullYear()} 1C Global Trader. All rights reserved.
+            </div>
+      
+            <div className="flex items-center gap-4 text-xs">
+              <Link to="/terms" className="text-gray-500 hover:text-yellow-400 transition">
+                Terms
+              </Link>
+              <Link to="/privacy" className="text-gray-500 hover:text-yellow-400 transition">
+                Privacy
+              </Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div> 
+    
   </>
   );
 }
@@ -411,5 +541,26 @@ function WhyCard({ title, desc }) {
       <div className="text-lg font-black text-white">{title}</div>
       <div className="mt-2 text-sm text-gray-400 leading-relaxed">{desc}</div>
     </div>
+  );
+}
+function TeamCard({ name, role, img }) {
+  return (
+    <motion.div 
+      whileHover={{ y: -5 }}
+      className="bg-black/40 border border-gray-800/60 rounded-3xl p-5 text-center group transition-all hover:border-yellow-500/30"
+    >
+      <div className="relative w-24 h-24 mx-auto mb-4">
+        <div className="absolute inset-0 bg-yellow-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+        <img 
+          src={img} 
+          alt={name} 
+          className="relative w-full h-full object-cover rounded-2xl border-2 border-gray-800 group-hover:border-yellow-500/50 transition-colors"
+        />
+      </div>
+      <div className="font-black text-white text-sm tracking-tight">{name}</div>
+      <div className="text-[11px] text-gray-500 uppercase mt-1 font-bold group-hover:text-yellow-400 transition-colors">
+        {role}
+      </div>
+    </motion.div>
   );
 }

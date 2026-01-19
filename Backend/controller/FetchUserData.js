@@ -41,7 +41,8 @@ isActive: !!user.isActive,
 Referal:user.Referal ?? [],
 createdAt: user.createdAt,
 level:user.level,
-earnings:user.earnings
+earnings:user.earnings,
+WithdrwalAmt:user.WithdrwalAmt
       },
     });
   } catch (error) {

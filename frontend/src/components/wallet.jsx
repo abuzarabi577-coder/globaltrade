@@ -72,7 +72,7 @@ const pendingSum = useMemo(() => {
 }, [withdrawHistory]);
 const handleWithdraw = () => {
   // ✅ backend ko net amount bhejo
-  createWithdraw(withdrawFinal);
+  createWithdraw(withdrawAmount);
 };
 
 if (!FetchUserData) {
@@ -284,7 +284,7 @@ max={Number(FetchUserData?.totalEarnings || 0)}
     <span className="text-orange-400 font-black">-${withdrawFee.toFixed(2)}</span>
   </div>
 
-  <div className="h-px bg-slate-700/60 my-3" />
+  <div className="h-px  bg-slate-700/60 my-3" />
 
   <div className="flex items-center justify-between">
     <span className="text-slate-200 font-bold">Final Amount (You Receive)</span>
@@ -293,18 +293,19 @@ max={Number(FetchUserData?.totalEarnings || 0)}
 </div>
 
       
+<div className='py-4'>
 
       {/* WITHDRAW BUTTON */}
       <motion.button
 onClick={handleWithdraw}
-
-        className="w-full py-5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-500 text-slate-900 font-black text-xl rounded-3xl shadow-2xl hover:shadow-emerald-500/50 border-2 border-emerald-400/50 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full py-4 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-500 text-slate-900 font-black text-xl rounded-3xl shadow-2xl hover:shadow-emerald-500/50 border-2 border-emerald-400/50 disabled:opacity-50 disabled:cursor-not-allowed"
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
 disabled={!canWithdraw}
       >
 🚀 Withdraw ${withdrawFinal.toFixed(2)}
       </motion.button>
+</div>
 
       <div className="mt-6 text-xs text-slate-500 text-center space-y-1">
         <p>• Minimum: $50</p>

@@ -12,6 +12,7 @@ import AdminTasksRoutes from './Routes/admintasksRoute.js';
 import adminUsersRoutes from './Admincontroller/fetchadminUsersController.js';
 import adminAuthRoutes from './Routes/AdminAuthRoutes.js';
 import { startLeaderboardJob } from './Admincontroller/leaderboard.job.js';
+import { syncPendingPayouts } from './cron/payoutChecker.js';
 const app= express()
 app.use(express.json());           // JSON data parse
 
@@ -20,14 +21,18 @@ connectDB()
 
 app.use(cookieParser());
 app.use(cors({
-  origin: 'https://1cglobal.cc', // Frontend URL
+  origin: true, // Frontend URL
   credentials: true // ✅ Cookies allow
 }));
 app.use(express.urlencoded({       // Form data parse
   extended: true 
 }));
 startLeaderboardJob();
-
+// Har 5 minute (300,000 milliseconds) baad chalega
+setInterval(() => {
+    console.log("Checking for pending payouts...");
+    syncPendingPayouts();
+}, 300000);
 app.use('/api/auth',AuthRoutes)
 app.use('/api/user', UserRoutes);
 app.use('/api/admin', AdminTasksRoutes);

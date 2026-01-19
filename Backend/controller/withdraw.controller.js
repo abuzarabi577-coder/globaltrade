@@ -1,19 +1,22 @@
-// controller/withdraw.controller.js
 import WithdrawRequest from "../DBModels/WithdrawRequest.js";
 import User from "../DBModels/UserProfile.js";
 
 const MIN_WITHDRAW = 50;
+const WITHDRAW_FEE_PERCENT = 10; // 10% Fee
 
 const mapUserNetworkToPayram = (userNetwork) => {
   const n = String(userNetwork || "").toLowerCase();
+  // PayRam usually needs ETH for ERC20 or TRX for TRC20
   if (n.includes("erc") || n.includes("eth")) return { blockchainCurrency: "ETH", network: "ERC20" };
+  if (n.includes("trc") || n.includes("tron")) return { blockchainCurrency: "TRX", network: "TRC20" };
   return { blockchainCurrency: "ETH", network: "ERC20" };
 };
 
 export async function createWithdrawRequest(req, res) {
   try {
     const userId = req.userId || req.user?._id;
-    const amountUSD = Number(req.body.amount);
+    const amountUSD = Number(req.body.amount); // Original amount from frontend (e.g. 100)
+console.log('amountUSD',amountUSD);
 
     if (!Number.isFinite(amountUSD) || amountUSD <= 0) {
       return res.status(400).json({ success: false, message: "Invalid amount" });
@@ -22,11 +25,9 @@ export async function createWithdrawRequest(req, res) {
       return res.status(400).json({ success: false, message: `Minimum withdraw is ${MIN_WITHDRAW} USDT` });
     }
 
-    // ✅ include Iswithdraw + Freeze in select
     const user = await User.findById(userId).select("walletAddress network totalEarnings Iswithdraw Freeze");
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    // ✅ optional: block if account frozen
     if (user.Freeze === true) {
       return res.status(403).json({
         success: false,
@@ -35,7 +36,6 @@ export async function createWithdrawRequest(req, res) {
       });
     }
 
-    // ✅ MAIN: withdraw locked
     if (user.Iswithdraw === false) {
       return res.status(403).json({
         success: false,
@@ -53,11 +53,16 @@ export async function createWithdrawRequest(req, res) {
       return res.status(400).json({ success: false, message: "Insufficient balance" });
     }
 
+    // 🔥 FEE CALCULATION LOGIC
+    const feeAmount = (amountUSD * WITHDRAW_FEE_PERCENT) / 100;
+    const amountAfterFee = amountUSD - feeAmount; // Ye wo amount hai jo user ko milegi
+
     const { blockchainCurrency, network } = mapUserNetworkToPayram(user.network);
 
     const wr = await WithdrawRequest.create({
       userId,
-      amount: amountUSD,
+      amount: amountUSD,           // Full Amount (e.g., 100) - For balance check
+  amountUSD: amountAfterFee,   // Original amount (e.g. 100) - For balance deduction record
       asset: "USDT",
       blockchainCurrency,
       network,
@@ -65,9 +70,13 @@ export async function createWithdrawRequest(req, res) {
       status: "pending",
     });
 
-    return res.json({ success: true, message: "Withdraw request submitted", request: wr });
+    return res.json({ 
+      success: true, 
+      message: `Withdraw request of $${amountUSD} submitted. You will receive $${amountAfterFee} after 10% fee.`, 
+      request: wr 
+    });
+
   } catch (e) {
-    //console.error("createWithdrawRequest error:", e);
     return res.status(500).json({ success: false, message: e.message });
   }
 }

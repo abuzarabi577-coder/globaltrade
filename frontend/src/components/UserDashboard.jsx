@@ -23,7 +23,7 @@ import Wallet from "./wallet";
 
 export default function UserDashboard({ me }) {
   const navigate = useNavigate();
-  const { FetchUserData, HandleFetchUserData ,showAlert ,loading,PaymentINV,alert,fetchLatestInvoice,checkInvoiceStatus} = useAppContext();
+  const { FetchUserData, HandleFetchUserData ,showAlert ,loading,PaymentINV,alert,fetchLatestInvoice,checkInvoiceStatus,fetchWithdrawHistory, handleRefreshStatus,withdrawHistory} = useAppContext();
 //console.log(FetchUserData);
   const location = useLocation();
   const [showPlans, setShowPlans] = useState(false); // ✅ toggle
@@ -44,7 +44,9 @@ useEffect(() => {
     setShowReferral(false);
   }
 }, [searchParams]);
-
+useEffect(() => {
+  fetchWithdrawHistory();
+}, [fetchWithdrawHistory]);
   // ✅ Fetch once / safe (recommended)
   useEffect(() => {
      HandleFetchUserData();
@@ -284,7 +286,19 @@ if (showWallet) {
             {loading ? "Checking..." : "I have paid"}
           </motion.button>
         )}
-            
+            {/* ✅ Naya Withdraw Status Button Yahan Ayega */}
+  {withdrawHistory.find(wr => ["pending", "initiated", "processing"].includes(wr.status)) && (
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      disabled={loading}
+      onClick={() => handleRefreshStatus(withdrawHistory.find(wr => ["pending", "initiated", "processing"].includes(wr.status))._id)}
+      className="px-6 py-3 rounded-2xl bg-blue-600 text-white font-black border border-blue-500 shadow-lg shadow-blue-500/20 flex items-center gap-2"
+    >
+      <FaHistory className={loading ? "animate-spin" : ""} />
+      {loading ? "Checking..." : "Check Withdraw status"}
+    </motion.button>
+  )}
           </div>
         </div>
 

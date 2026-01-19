@@ -42,7 +42,7 @@ const [withdrawHistory, setWithdrawHistory] = useState([]);
       // const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
       // const userId = userProfile._id || userProfile.userId || userProfile.id;
       
-      // //console.log('🚀 SYNC DEBUG:', { taskIds, userId });
+      // ////console.log('🚀 SYNC DEBUG:', { taskIds, userId });
       
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; 
 
@@ -61,7 +61,7 @@ const [withdrawHistory, setWithdrawHistory] = useState([]);
       });
       
       const result = await response.json();
-      //console.log('📡 API Response:', result);
+      ////console.log('📡 API Response:', result);
       
       if (result.success) {
     setloading(false)
@@ -69,13 +69,12 @@ const [withdrawHistory, setWithdrawHistory] = useState([]);
         showAlert('success', result.message || 'Tasks saved successfully!');
         return true;
       } else {
-      setloading(false)
-
         showAlert('error', result.message || 'Tasks failed!');
+        setloading(false)
         return false;
       }
     } catch (error) {
-      //console.error('💥 API Error:', error);
+      ////console.error('💥 API Error:', error);
       showAlert('error', 'Network error - Check backend!');
       return false;
     }
@@ -111,7 +110,7 @@ const [withdrawHistory, setWithdrawHistory] = useState([]);
       }
     } catch (error) {
       // setTasksStatus('error');
-      //console.error('💥 Admin Tasks Error:', error);
+      ////console.error('💥 Admin Tasks Error:', error);
       showAlert('error', 'Network error');
       return false;
     }
@@ -165,7 +164,7 @@ const updateAdminTask = async (taskId, taskData) => {
       return false;
     }
   } catch (error) {
-    //console.error('💥 Update error:', error);
+    ////console.error('💥 Update error:', error);
     showAlert('error', 'Network error');
     return false;
   }
@@ -177,7 +176,7 @@ const deleteAdminTask = async (taskId) => {
   try {
     setloading(true)
 
-    //console.log(taskId);
+    ////console.log(taskId);
     
     const response = await fetch(
       `${backendURL}/api/admin/delete-task/${taskId}`,
@@ -199,7 +198,7 @@ const deleteAdminTask = async (taskId) => {
       return false;
     }
   } catch (error) {
-    //console.error('💥 Delete error:', error);
+    ////console.error('💥 Delete error:', error);
     showAlert('error', 'Network error');
     return false;
   }
@@ -269,7 +268,7 @@ const fetchTodayTaskStatus = async () => {
       const result = await response.json();
       if (result.success && result.user) {
       setFetchUserData(result.user)    
-      //console.log('data',result.user);
+      ////console.log('data',result.user);
       
   }
       return [];
@@ -307,7 +306,7 @@ const HandleCreateInvestmentPlan = async (planData) => {
     setloading(false)
 
     showAlert("success", data.message || "Plan saved successfully!");
-    //console.log(data.invoice);
+    ////console.log(data.invoice);
     setPaymentINV(data.invoice)
     // ✅ refresh user data so UI updates
     await HandleFetchUserData();
@@ -421,7 +420,32 @@ const checkInvoiceStatus = async (referenceId) => {
   }
 };
 
+const handleRefreshStatus = async (withdrawId) => {
+  try {
+    setloading(true); 
+    // Is line ko check karein: Agar backend par withdraw route ke andar hai to theek, 
+    // warna '/api/user/check-status/' use karein
+    const res = await fetch(`${backendURL}/api/user/withdraw/check-status/${withdrawId}`, {
+      method: "GET",
+      credentials: "include",
+    });
 
+    const result = await res.json();
+
+    if (result.success) {
+      showAlert('success', `Status updated: ${result.status}`);
+      await fetchWithdrawHistory(); // List update karne ke liye
+    } else {
+      // 400 error yahan message dikhayega
+      showAlert('error', result.message || "Failed to sync status");
+    }
+  } catch (err) {
+    //console.error("Refresh failed", err);
+    showAlert('error', "Network error or timeout");
+  } finally {
+    setloading(false); 
+  }
+};
   return (
     <AppContext.Provider value={{
       syncTasksToBackend,    // ✅ Main function
@@ -429,7 +453,7 @@ const checkInvoiceStatus = async (referenceId) => {
       showAlert,saveAdminTasks,
       HandleFetchAdminTasks,FetchAdminTasks,loading, setloading,
       updateAdminTask,deleteAdminTask,HandleFetchUserTasks,FetchUserTask,fetchTodayTaskStatus,FetchUserData,HandleFetchUserData,HandleCreateInvestmentPlan
-      ,loading,PaymentINV,fetchLatestInvoice,createWithdraw,fetchWithdrawHistory,withdrawHistory,checkInvoiceStatus
+      ,loading,PaymentINV,fetchLatestInvoice,createWithdraw,fetchWithdrawHistory,withdrawHistory,checkInvoiceStatus,handleRefreshStatus
     }}>
       {children}
     </AppContext.Provider>

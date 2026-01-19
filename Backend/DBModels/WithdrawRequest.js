@@ -3,9 +3,8 @@ import mongoose from "mongoose";
 const withdrawRequestSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
-
     amount: { type: Number, required: true },
-
+amountUSD: { type: Number },                 // 90 (Add this line)
     asset: { type: String, default: "USDT" },
     network: { type: String, default: "ERC20" },     // display
     blockchainCurrency: { type: String, default: "ETH" }, // PayRam code
@@ -26,7 +25,7 @@ const withdrawRequestSchema = new mongoose.Schema(
     "paid",
 
     "rejected",
-    "failed",
+    "failed",'processed'
   ],      default: "pending",
       index: true,
     },
