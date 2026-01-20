@@ -1,7 +1,7 @@
 import WithdrawRequest from "../DBModels/WithdrawRequest.js";
 import User from "../DBModels/UserProfile.js";
 
-const MIN_WITHDRAW = 50;
+const MIN_WITHDRAW = 20;
 const WITHDRAW_FEE_PERCENT = 10; // 10% Fee
 
 const mapUserNetworkToPayram = (userNetwork) => {

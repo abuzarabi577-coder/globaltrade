@@ -14,7 +14,7 @@ export const useAppContext = () => {
 
 export const AppcontextProvider = ({ children }) => {
   const navigate = useNavigate();
-  const backendURL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+  const backendURL = process.env.REACT_APP_BACKEND_URL || 'https://api.1cglobal.cc';
   
   const [FetchAdminTasks, setFetchAdminTasks] = useState([]); // idle, loading, success, error
   const [FetchUserTask, setFetchUserTask] = useState([]); // idle, loading, success, error

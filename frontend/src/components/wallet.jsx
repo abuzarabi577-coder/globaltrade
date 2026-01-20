@@ -33,7 +33,7 @@ const withdrawFinal = useMemo(() => {
 
 const canWithdraw = useMemo(() => {
   if (!withdrawAmount) return false;
-  if (withdrawNum < 50) return false; // ✅ your min rule
+  if (withdrawNum < 20) return false; // ✅ your min rule
   if (withdrawNum > Number(FetchUserData?.totalEarnings || 0)) return false; // ✅ real available
   return true;
 }, [withdrawAmount, withdrawNum, FetchUserData]);
@@ -308,7 +308,7 @@ disabled={!canWithdraw}
 </div>
 
       <div className="mt-6 text-xs text-slate-500 text-center space-y-1">
-        <p>• Minimum: $50</p>
+        <p>• Minimum: $20</p>
         <p>• Processing: 24-48 hours</p>
       </div>
     </div>

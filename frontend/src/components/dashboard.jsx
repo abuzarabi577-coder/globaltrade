@@ -19,6 +19,7 @@ import { useAuth } from "../context/AuthContext";
 import { useAppContext } from "../context/AppContext";
 import Alert from "./Alert";
 import InvestPlanCards from "./InvestPlanCards";
+import WinnerAnnouncementModal from "./winnerModal";
 
 export default function Dashboard() {
   const [activeNav, setActiveNav] = useState("home");
@@ -156,7 +157,7 @@ const goToPage = async (page) => {
 
     {/* ✅ TopNavbar ALWAYS visible */}
     <TopNavbar />
-
+<WinnerAnnouncementModal autoCloseMs={5000} showOncePerSession />
     {/* ================= CONTENT ================= */}
 
     {/* ✅ ONLY plans page */}

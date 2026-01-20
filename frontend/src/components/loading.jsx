@@ -148,7 +148,7 @@ function LogoLoader() {
   fill="url(#gold)"
   letterSpacing="1"
 >
-  TRADER
+  Global
 </text>
 
     </svg>

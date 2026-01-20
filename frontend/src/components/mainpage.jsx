@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import UserDashboard from './UserDashboard';
 import { useAuth } from '../context/AuthContext';
 import InvestPlanCards from './InvestPlanCards';
+import PublicTopRankers from './publicTopRanker';
 
 export default function Mainpage() {
 const navigate =useNavigate()
@@ -703,6 +704,7 @@ Founder’s Syndicate  </span>
         
         
         )}
+        <PublicTopRankers/>
       </div>
 
       {/* Fixed Bottom Navigation */}

@@ -10,6 +10,7 @@ import { createWithdrawRequest } from '../controller/withdraw.controller.js';
 import { getMyWithdrawHistory } from '../controller/withdrawhistory.controller.js';
 import { requestResetOtp } from '../controller/auth.forgot.controller.js';
 import { checkUserWithdrawStatus } from '../controller/withdrawCheckBYUser.js';
+import { getPublicTopRankers } from '../controller/publicleaderboard.js';
 
 const router = express.Router();
 
@@ -28,4 +29,8 @@ router.post('/investment-plan',authMiddleware, activatePlanFromInvoice);
 router.post('/withdraw/create',authMiddleware, createWithdrawRequest);
 router.get('/withdraw/myhistory',authMiddleware, getMyWithdrawHistory);
 router.get("/withdraw/check-status/:id", authMiddleware, checkUserWithdrawStatus);
+
+router.get("/leaderboard/top", getPublicTopRankers);
+router.get("/top-rankers", getPublicTopRankers);
+
 export default router;

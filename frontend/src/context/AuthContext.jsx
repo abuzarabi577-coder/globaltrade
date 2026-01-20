@@ -29,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   const [alert, setAlert] = useState({ isOpen: false, type: "", message: "" });
 
   const navigate = useNavigate();
-  const backendURL = "http://localhost:5000";
+  const backendURL =process.env.REACT_APP_BACKEND_URL ||  "https://api.1cglobal.cc";
 
   const [mode, setMode] = useState("login");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
