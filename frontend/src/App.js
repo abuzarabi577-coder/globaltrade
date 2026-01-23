@@ -20,12 +20,14 @@ import AdminProtectedRoute from './Admin/AdminProtectedRoute';
 import ForgetPassword from './components/ForgetPassword';
 import ForgetOtp from './components/ForgetOtp';
 import ResetPassword from './components/ResetPassword';
+import MaintenanceModal from './components/maintainceModal';
 
 const App = () => {
     const { loading} = useAppContext();
     const { authLoading} = useAuth();
   const {
 Adminloading} = useAdmin();
+const MAINTENANCE=process.env.Maintance ==='true'
   return (
 
     <>
@@ -35,7 +37,7 @@ Adminloading} = useAdmin();
     <LoadingInlineLogo />
   </div>
 )}
-
+<MaintenanceModal isOpen={MAINTENANCE}/>
      <Routes>
       <Route path="/" element={<Dashboard />} />
       <Route path="/login" element={<AuthModal />} />

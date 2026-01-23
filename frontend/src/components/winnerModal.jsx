@@ -81,12 +81,12 @@ export default function WinnerAnnouncementModal({ autoCloseMs = 5000 }) {
                 </p>
       <div className="flex justify-center mb-4">
   <img
-    src="/image/iphone.png"
+    src="/image/iphone.png.jpeg"
     alt="iPhone Reward"
     className="w-24 md:w-32 drop-shadow-2xl"
   />
   <img
-    src="/image/iphone17.png"
+    src="/image/iphone17.png.jpeg"
     alt="iPhone Reward"
     className="w-24 md:w-32 drop-shadow-2xl"
   />
