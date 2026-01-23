@@ -1,126 +1,132 @@
 import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { FaTools, FaTimes, FaClock } from "react-icons/fa";
 
-export default function MaintenanceModal({
-  isOpen = false,
-  title = "Website Under Maintenance",
-  message = "We’re performing scheduled maintenance to improve performance and security. Please check back soon.",
-  subMessage = "If you need urgent support, contact us at support@1cglobal.cc",
+export default function UnderMaintenanceModal({
+  openByDefault = true,
+  lockSite = true,           // true => user click/scroll background nahi kar sakta
+  showClose = true,          // false => close button hide
+  messageTitle = "Website Under Maintenance",
+  messageText = "We’re upgrading our systems for a better experience. Please check back shortly.",
+  supportText = "If you need urgent help, contact: support@1cglobal.ch",
 }) {
-  const [open, setOpen] = useState(isOpen);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    setOpen(isOpen);
-  }, [isOpen]);
+    if (openByDefault) setOpen(true);
+  }, [openByDefault]);
 
-  // Lock scroll when modal open
+  // lock body scroll
   useEffect(() => {
+    if (!lockSite) return;
     if (open) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "auto";
-    return () => (document.body.style.overflow = "auto");
-  }, [open]);
-
-  if (!open) return null;
+    else document.body.style.overflow = "";
+    return () => (document.body.style.overflow = "");
+  }, [open, lockSite]);
 
   return (
-    <div style={styles.backdrop}>
-      <div style={styles.modal}>
-        <div style={styles.badge}>Maintenance</div>
+    <AnimatePresence>
+      {open && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-black/75 backdrop-blur-sm"
+          />
 
-        <h2 style={styles.title}>{title}</h2>
-        <p style={styles.text}>{message}</p>
-        <p style={styles.subText}>{subMessage}</p>
+          {/* Modal */}
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 260, damping: 22 }}
+            className="fixed inset-0 z-[10000] flex items-center justify-center p-4"
+          >
+            <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-gray-800/70 bg-gradient-to-b from-[#070b14] via-black to-[#070b14] shadow-2xl">
+              {/* Glow */}
+              <div className="absolute -top-24 -right-24 w-64 h-64 bg-yellow-500/10 blur-3xl rounded-full" />
+              <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-500/10 blur-3xl rounded-full" />
 
-        <div style={styles.hr} />
+              {/* Close */}
+              {showClose && (
+                <button
+                  onClick={() => setOpen(false)}
+                  type="button"
+                  aria-label="Close"
+                  className="absolute top-4 right-4 w-11 h-11 rounded-2xl bg-black/40 border border-gray-800/70 flex items-center justify-center text-gray-200 hover:border-yellow-500/40 hover:text-yellow-300 transition"
+                >
+                  <FaTimes />
+                </button>
+              )}
 
-        <div style={styles.note}>
-          We’ll be back shortly. Thank you for your patience.
-        </div>
+              {/* Header */}
+              <div className="relative p-6 border-b border-gray-800/60">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 text-yellow-300 text-xs font-black uppercase tracking-wider">
+                  <FaTools />
+                  Maintenance Mode
+                </div>
 
-        {/* Optional: If you want NO close button, remove this */}
-        <button
-          onClick={() => setOpen(false)}
-          style={styles.btn}
-          aria-label="Close maintenance popup"
-        >
-          Okay
-        </button>
-      </div>
-    </div>
+                <h2 className="text-2xl md:text-3xl font-black text-white mt-3">
+                  {messageTitle}
+                </h2>
+
+                <p className="text-sm text-gray-400 mt-2">
+                  {messageText}
+                </p>
+              </div>
+
+              {/* Body */}
+              <div className="p-6 space-y-4">
+                <div className="rounded-2xl bg-black/40 border border-gray-800/60 p-4">
+                  <div className="flex items-center gap-2 text-gray-200 font-bold">
+                    <FaClock className="text-yellow-400" />
+                    Expected Back Soon
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    We’re applying updates, security patches, and performance improvements.
+                  </p>
+                </div>
+
+                <div className="text-xs text-gray-500">
+                  {supportText}
+                </div>
+
+                {/* Buttons */}
+                <div className="pt-2 flex flex-col sm:flex-row gap-3">
+                  {showClose ? (
+                    <button
+                      onClick={() => setOpen(false)}
+                      className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-yellow-500 to-yellow-600 text-gray-900 font-black border border-yellow-500 shadow-lg hover:shadow-yellow-500/30 transition"
+                      type="button"
+                    >
+                      Continue
+                    </button>
+                  ) : (
+                    <button
+                      className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-white/5 border border-gray-800/70 text-gray-200 font-black"
+                      type="button"
+                      disabled
+                    >
+                      Maintenance Active
+                    </button>
+                  )}
+
+                  <a
+                    href="mailto:support@1cglobal.ch"
+                    className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-white/5 border border-gray-800/70 text-gray-200 font-black hover:bg-white/10 transition text-center"
+                  >
+                    Contact Support
+                  </a>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 }
-
-const styles = {
-  backdrop: {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,0.75)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 999999,
-    padding: 16,
-  },
-  modal: {
-    width: "100%",
-    maxWidth: 520,
-    background: "#0b1220",
-    border: "1px solid rgba(255,255,255,0.12)",
-    borderRadius: 16,
-    padding: 22,
-    boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
-    color: "#fff",
-    fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial",
-  },
-  badge: {
-    display: "inline-flex",
-    padding: "6px 10px",
-    borderRadius: 999,
-    background: "rgba(255, 193, 7, 0.14)",
-    border: "1px solid rgba(255, 193, 7, 0.35)",
-    color: "#FFC107",
-    fontSize: 12,
-    fontWeight: 700,
-    letterSpacing: 0.3,
-    marginBottom: 12,
-  },
-  title: {
-    margin: 0,
-    fontSize: 22,
-    fontWeight: 800,
-    lineHeight: 1.2,
-  },
-  text: {
-    marginTop: 10,
-    marginBottom: 10,
-    fontSize: 14,
-    color: "rgba(255,255,255,0.85)",
-    lineHeight: 1.5,
-  },
-  subText: {
-    marginTop: 0,
-    marginBottom: 0,
-    fontSize: 13,
-    color: "rgba(255,255,255,0.65)",
-    lineHeight: 1.5,
-  },
-  hr: {
-    height: 1,
-    background: "rgba(255,255,255,0.12)",
-    margin: "16px 0",
-  },
-  note: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.65)",
-    marginBottom: 14,
-  },
-  btn: {
-    width: "100%",
-    height: 42,
-    borderRadius: 12,
-    border: "1px solid rgba(255,255,255,0.14)",
-    background: "rgba(255,255,255,0.06)",
-    color: "#fff",
-    fontWeight: 700,
-    cursor: "pointer",
-  },
-};

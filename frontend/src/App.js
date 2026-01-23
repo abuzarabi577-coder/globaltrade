@@ -27,7 +27,7 @@ const App = () => {
     const { authLoading} = useAuth();
   const {
 Adminloading} = useAdmin();
-const MAINTENANCE=process.env.Maintance ==='true'
+const MAINTENANCE=process.env.REACT_Maintance ==='true'
   return (
 
     <>

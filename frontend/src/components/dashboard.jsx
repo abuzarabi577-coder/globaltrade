@@ -20,6 +20,7 @@ import { useAppContext } from "../context/AppContext";
 import Alert from "./Alert";
 import InvestPlanCards from "./InvestPlanCards";
 import WinnerAnnouncementModal from "./winnerModal";
+import UnderMaintenanceModal from "./maintainceModal";
 
 export default function Dashboard() {
   const [activeNav, setActiveNav] = useState("home");
@@ -154,7 +155,11 @@ const goToPage = async (page) => {
       isOpen={alert.isOpen}
       onClose={() => showAlert({ isOpen: false, type: "", message: "" })}
     />
-
+   <UnderMaintenanceModal
+        openByDefault={true}
+        lockSite={true}
+        showClose={true} // close allow
+      />
     {/* ✅ TopNavbar ALWAYS visible */}
     <TopNavbar />
 <WinnerAnnouncementModal autoCloseMs={5000} showOncePerSession />
