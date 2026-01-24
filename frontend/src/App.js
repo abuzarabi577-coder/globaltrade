@@ -37,7 +37,6 @@ const MAINTENANCE=process.env.REACT_Maintance ==='true'
     <LoadingInlineLogo />
   </div>
 )}
-{/* <MaintenanceModal isOpen={MAINTENANCE}/> */}
      <Routes>
       <Route path="/" element={<Dashboard />} />
       <Route path="/login" element={<AuthModal />} />

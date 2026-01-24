@@ -87,7 +87,7 @@ export default function UnderMaintenanceModal({
                     Expected Back Soon
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
-                    We’re applying updates, security patches, and performance improvements.
+                    We’re applying updates, security patches, and performance improvements
                   </p>
                 </div>
 
