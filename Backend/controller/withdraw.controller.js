@@ -47,7 +47,24 @@ console.log('amountUSD',amountUSD);
     if (!user.walletAddress) {
       return res.status(400).json({ success: false, message: "Wallet address not set in profile" });
     }
+// ✅ Block duplicate requests (if already pending/processing)
+const existing = await WithdrawRequest.findOne({
+  userId,
+  status: { $in: ["pending", "processing", "pending-approval"] },
+}).select("_id status createdAt");
 
+if (existing) {
+  return res.status(409).json({
+    success: false,
+    code: "WITHDRAW_ALREADY_SUBMITTED",
+    message: "Your withdraw request is already submitted. Please wait for processing.",
+    existing: {
+      id: existing._id,
+      status: existing.status,
+      createdAt: existing.createdAt,
+    },
+  });
+}
     const available = Number(user.totalEarnings || 0);
     if (available < amountUSD) {
       return res.status(400).json({ success: false, message: "Insufficient balance" });
