@@ -87,12 +87,16 @@ const statusColor =
     : ["approved", "paid", "processed", "completed", "success"].includes(status)
     ? "text-emerald-400"
     : "text-red-400";
+
+
 const boxColor =
   status === "pending" || status === "processing"
     ? "bg-orange-500/20 border-orange-500/50 text-orange-400"
     : ["approved","paid","processed","completed","success"].includes(status)
     ? "bg-emerald-500/15 border-emerald-500/35 text-emerald-400"
     : "bg-red-500/15 border-red-500/35 text-red-400";
+
+
     return (
         <div className="min-h-full pt-0 pb-24 bg-gradient-to-br from-slate-900 via-black to-slate-950 text-white">
             {/* HEADER */}
@@ -193,8 +197,7 @@ ${availableBalance.toFixed(2)}
                         </div>
                     </motion.div>
                 )}
-
-                {activeTab === "history" && (
+{activeTab === "history" && (
   <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
     <div className="space-y-3">
       <h3 className="text-xl font-bold text-slate-100 mb-6 flex items-center gap-2">
@@ -202,42 +205,58 @@ ${availableBalance.toFixed(2)}
         <span className="text-emerald-400 text-sm font-bold">Live</span>
       </h3>
 
-      {
-        withdrawHistory.map((w, idx) => (
+      {(Array.isArray(withdrawHistory) ? withdrawHistory : []).map((w, idx) => {
+        const status = String(w?.status || "").trim().toLowerCase();
+
+        const statusColor =
+          status === "pending" || status === "processing"
+            ? "text-orange-400"
+            : ["approved", "paid", "processed", "completed", "success"].includes(status)
+            ? "text-emerald-400"
+            : "text-red-400";
+
+        const boxColor =
+          status === "pending" || status === "processing"
+            ? "bg-orange-500/20 border-orange-500/50 text-orange-400"
+            : ["approved", "paid", "processed", "completed", "success"].includes(status)
+            ? "bg-emerald-500/15 border-emerald-500/35 text-emerald-400"
+            : "bg-red-500/15 border-red-500/35 text-red-400";
+
+        return (
           <motion.div
-            key={w._id}
+            key={w?._id || idx}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.05 }}
             className="bg-slate-900/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-5 hover:bg-slate-800/50 transition-all flex items-center justify-between"
           >
             <div className="flex items-center gap-4">
-             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold border-2 ${boxColor}`}>
-  ↓
-</div>
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold border-2 ${boxColor}`}>
+                ↓
+              </div>
 
               <div>
                 <div className="font-bold text-slate-200">Withdrawal</div>
                 <div className="text-xs text-slate-500">
-                  #{String(w._id).slice(-6)} • {new Date(w.createdAt).toLocaleString()}
+                  #{String(w?._id || "").slice(-6)} • {w?.createdAt ? new Date(w.createdAt).toLocaleString() : "—"}
                 </div>
                 <div className="text-xs text-slate-400">
-                  {w.asset} • {w.network} • {maskWallet(w.toAddress)}
+                  {w?.asset || "—"} • {w?.network || "—"} • {maskWallet(w?.toAddress)}
                 </div>
               </div>
             </div>
 
             <div className="text-right">
               <div className="text-xl font-black text-orange-400">
-                -${Number(w.amount || 0).toFixed(2)}
+                -${Number(w?.amount || 0).toFixed(2)}
               </div>
-            <div className={`text-xs font-bold ${statusColor}`}>
-  {status}
-</div>
+              <div className={`text-xs font-bold ${statusColor}`}>
+                {status || "unknown"}
+              </div>
             </div>
           </motion.div>
-        )
-      )}
+        );
+      })}
     </div>
   </motion.div>
 )}
