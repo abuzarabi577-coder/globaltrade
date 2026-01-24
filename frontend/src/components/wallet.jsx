@@ -79,8 +79,20 @@ if (!FetchUserData) {
   setloading(true)
 }
 
+const status = String(w.status || "").trim().toLowerCase();
 
-
+const statusColor =
+  status === "pending" || status === "processing"
+    ? "text-orange-400"
+    : ["approved", "paid", "processed", "completed", "success"].includes(status)
+    ? "text-emerald-400"
+    : "text-red-400";
+const boxColor =
+  status === "pending" || status === "processing"
+    ? "bg-orange-500/20 border-orange-500/50 text-orange-400"
+    : ["approved","paid","processed","completed","success"].includes(status)
+    ? "bg-emerald-500/15 border-emerald-500/35 text-emerald-400"
+    : "bg-red-500/15 border-red-500/35 text-red-400";
     return (
         <div className="min-h-full pt-0 pb-24 bg-gradient-to-br from-slate-900 via-black to-slate-950 text-white">
             {/* HEADER */}
@@ -200,9 +212,9 @@ ${availableBalance.toFixed(2)}
             className="bg-slate-900/50 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-5 hover:bg-slate-800/50 transition-all flex items-center justify-between"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold bg-orange-500/20 border-2 border-orange-500/50 text-orange-400">
-                ↓
-              </div>
+             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold border-2 ${boxColor}`}>
+  ↓
+</div>
 
               <div>
                 <div className="font-bold text-slate-200">Withdrawal</div>
@@ -219,17 +231,9 @@ ${availableBalance.toFixed(2)}
               <div className="text-xl font-black text-orange-400">
                 -${Number(w.amount || 0).toFixed(2)}
               </div>
-              <div
-                className={`text-xs font-bold ${
-                  w.status === "pending" || w.status === "processing"
-                    ? "text-orange-400"
-                    : w.status === "approved" || w.status === "paid"
-                    ? "text-emerald-400"
-                    : "text-red-400"
-                }`}
-              >
-                {w.status}
-              </div>
+            <div className={`text-xs font-bold ${statusColor}`}>
+  {status}
+</div>
             </div>
           </motion.div>
         )

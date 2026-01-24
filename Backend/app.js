@@ -20,16 +20,23 @@ app.use(express.json());           // JSON data parse
 connectDB()
 
 app.use(cookieParser());
-app.use(cors({
-  origin: true, // Frontend URL
-  credentials: true // ✅ Cookies allow
-}));
+const corsOptions = {
+  origin: ["https://1cglobal.cc", "http://localhost:3000"],
+  credentials: true,
+  methods: ["GET","POST","PUT","PATCH","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization","x-user-tz"],
+};
+
+app.use(cors(corsOptions));
+
+// ✅ IMPORTANT: preflight
+app.options(/.*/, cors(corsOptions));
 app.use(express.urlencoded({       // Form data parse
   extended: true 
 }));
 startLeaderboardJob();
 // Har 5 minute (300,000 milliseconds) baad chalega
-setInterval(() => {
+setInterval(() => { 
     console.log("Checking for pending payouts...");
     syncPendingPayouts();
 }, 300000);
