@@ -5,6 +5,7 @@ import User from "../DBModels/UserProfile.js";
 import { PROFIT_SHARE_LEVELS } from "../constants/referralLevels.js";
 import { round2 } from "../utils/dayKey.js";
 import { checkAndClosePlanCap } from "../services/planCap.service.js";
+import { applyNoPlanReferralCap } from "../services/referralCap.service.js";
 
 const pctByLevel = new Map(PROFIT_SHARE_LEVELS.map((x) => [x.level, x.pct]));
 
@@ -34,7 +35,8 @@ export const distributeRoiProfitShare = async ({ dateKey, sourceUserId, roiAmoun
 
     const commission = round2((roiAmount * pct) / 100);
     if (commission <= 0) continue;
-
+const { allowed } = applyNoPlanReferralCap({ user: upline, commission: commission });
+if (allowed <= 0) continue
     try {
       await ReferralCommission.create({
         date: dateKey,
@@ -44,16 +46,16 @@ export const distributeRoiProfitShare = async ({ dateKey, sourceUserId, roiAmoun
         level,
         pct,
         baseAmount: roiAmount,
-        amount: commission,
+        amount: allowed,
       });
 
       await User.updateOne(
         { _id: upline._id },
-        { $inc: { "earnings.teamProfitShare": commission, totalEarnings: commission } }
+        { $inc: { "earnings.teamProfitShare": allowed, totalEarnings: allowed } }
       );
 await checkAndClosePlanCap(upline._id);
 
-      totalDistributed = round2(totalDistributed + commission);
+      totalDistributed = round2(totalDistributed + allowed);
       paid++;
     } catch (e) {
       if (e?.code !== 11000) throw e; // duplicate ignore

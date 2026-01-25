@@ -155,11 +155,11 @@ const goToPage = async (page) => {
       isOpen={alert.isOpen}
       onClose={() => showAlert({ isOpen: false, type: "", message: "" })}
     />
-   <UnderMaintenanceModal
+   {/* <UnderMaintenanceModal
         openByDefault={true}
         lockSite={true}
         showClose={true} // close allow
-      />
+      /> */}
     {/* ✅ TopNavbar ALWAYS visible */}
     <TopNavbar />
 

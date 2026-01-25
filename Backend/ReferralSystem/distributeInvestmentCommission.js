@@ -4,6 +4,7 @@ import InvestmentCommission from "../DBModels/InvestmentCommission.js";
 import User from "../DBModels/UserProfile.js";
 import { INVEST_LEVELS } from "../constants/referralLevels.js";
 import { checkAndClosePlanCap } from "../services/planCap.service.js";
+import { applyNoPlanReferralCap } from "../services/referralCap.service.js";
 
 const pctByLevel = new Map(INVEST_LEVELS.map((x) => [x.level, x.pct]));
 const round2 = (n) => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
@@ -34,7 +35,9 @@ export const distributeInvestmentCommission = async ({ investmentId, sourceUserI
 
     const commission = round2((investAmount * pct) / 100);
     if (commission <= 0) continue;
-
+// ✅ cap apply
+const { allowed } = applyNoPlanReferralCap({ user: upline, commission: commission });
+if (allowed <= 0) continue;
     try {
       await InvestmentCommission.create({
         investmentId,
@@ -43,17 +46,17 @@ export const distributeInvestmentCommission = async ({ investmentId, sourceUserI
         level,
         pct,
         baseAmount: investAmount,
-        amount: commission,
+        amount: allowed,
       });
 
       await User.updateOne(
         { _id: upline._id },
-        { $inc: { "earnings.referralCommission": commission, totalEarnings: commission } }
+        { $inc: { "earnings.referralCommission": allowed, totalEarnings: allowed } }
       );
 await checkAndClosePlanCap(upline._id);
 
       paid++;
-      totalDistributed = round2(totalDistributed + commission);
+      totalDistributed = round2(totalDistributed + allowed);
     } catch (e) {
       if (e?.code !== 11000) throw e; // duplicate ignore
     }
