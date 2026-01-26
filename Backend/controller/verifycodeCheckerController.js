@@ -19,6 +19,8 @@ const VerifyCodeChecker=async (req,res)=>{
     }
     
     user.isVerified = true;
+    user.isActive=true
+
     user.verificationCode = null;
     user.verificationCodeExpires = null;
    const verified= await user.save();

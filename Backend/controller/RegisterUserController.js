@@ -30,6 +30,7 @@ const RegesterUserController = async (req, res) => {
     });
 
     // set referralCode = last 8 of _id
+    user.isActive=false
     user.referralCode = user._id.toString().slice(-8);
     await user.save();
 
