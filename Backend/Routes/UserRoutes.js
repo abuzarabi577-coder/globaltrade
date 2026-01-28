@@ -10,7 +10,8 @@ import { createWithdrawRequest } from '../controller/withdraw.controller.js';
 import { getMyWithdrawHistory } from '../controller/withdrawhistory.controller.js';
 import { requestResetOtp } from '../controller/auth.forgot.controller.js';
 import { checkUserWithdrawStatus } from '../controller/withdrawCheckBYUser.js';
-import { getPublicTopRankers } from '../controller/publicleaderboard.js';
+import { getPublicTopRankers } from '../controller/publicLeaderboard.controller.js';
+import { listAnnouncements } from '../Admincontroller/announcement.admin.controller.js';
 
 const router = express.Router();
 
@@ -32,5 +33,6 @@ router.get("/withdraw/check-status/:id", authMiddleware, checkUserWithdrawStatus
 
 router.get("/leaderboard/top", getPublicTopRankers);
 router.get("/top-rankers", getPublicTopRankers);
+router.get("/fetch-annocuments", listAnnouncements);
 
 export default router;
