@@ -230,7 +230,15 @@ const finalPlan = useMemo(() => ({
   )}
 </div>
 
-
+<div className="mt-3 rounded-xl border border-orange-500/30 bg-orange-500/10 px-4 py-3">
+  <div className="text-xs font-bold text-orange-300">
+    ⚠️ Important: Please send <span className="text-white">2–3 USDT extra</span> (network fee) in addition to your investment amount.
+  </div>
+  <div className="text-[11px] text-slate-300 mt-1">
+    Example: If your investment is <span className="text-white font-semibold">${Number(customAmount || 0)}</span>, send about{" "}
+    <span className="text-white font-semibold">${Number(customAmount || 0) + 3}</span>.
+  </div>
+</div>
 
           {/* Wallet + Network */}
           <div className="mt-4 text-left bg-slate-900/40 border border-slate-700/60 rounded-xl p-4">

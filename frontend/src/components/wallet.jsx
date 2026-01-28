@@ -351,10 +351,15 @@ const Wallet = () => {
                 </motion.button>
               </div>
 
-              <div className="mt-6 text-xs text-slate-500 text-center space-y-1">
-                <p>• Minimum: $20</p>
-                <p>• Processing: 24-48 hours</p>
-              </div>
+            <div className="mt-6 text-xs text-slate-500 text-center space-y-1">
+  <p>• Minimum: $20</p>
+
+  <p className="text-emerald-400 font-bold">
+    • Withdraw requests: Only on 1st & 15th of each month
+  </p>
+
+  <p>• Processing: 24-48 hours</p>
+</div>
             </div>
           </motion.div>
         )}

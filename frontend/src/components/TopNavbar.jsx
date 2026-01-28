@@ -10,9 +10,12 @@ import {
   FaTimes,
   FaArrowRight,
   FaSignInAlt,
-  FaHeadset, // Naya icon support ke liye
+  FaHeadset,FaBullhorn // Naya icon support ke liye
 } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
+import { useAppContext } from "../context/AppContext";
+
+
 
 export default function TopNavbar() {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -20,9 +23,13 @@ export default function TopNavbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const panelRef = useRef(null);
-
+const [announceOpen, setAnnounceOpen] = useState(false);
   const { isLoggedIn, logoutUser } = useAuth();
-
+  const {
+  publicAnnouncements,
+  publicAnnouncementsLoading,
+  fetchPublicAnnouncements,
+} = useAppContext();
   // ✅ close mobile on route change
   useEffect(() => {
     setMobileOpen(false);
@@ -77,7 +84,7 @@ export default function TopNavbar() {
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className="fixed top-0 left-0 right-0 h-16 bg-gradient-to-r from-black/90 via-slate-900/90 to-black/90 backdrop-blur-xl border-b border-yellow-500/20 z-50"
+        className="top-0 left-0 right-0 h-16 bg-gradient-to-r from-black/90 via-slate-900/90 to-black/90 backdrop-blur-xl border-b border-yellow-500/20 z-50"
       >
         <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
           {/* LEFT */}
@@ -115,7 +122,22 @@ export default function TopNavbar() {
                 <FaSignInAlt /> Login
               </motion.button>
             ) : (
+              
               <div className="flex items-center gap-2">
+                <motion.button
+  type="button"
+  onClick={() => {
+    setAnnounceOpen(true);
+    fetchPublicAnnouncements?.();
+  }}
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+  className="flex items-center justify-center w-11 h-11 rounded-2xl bg-white/5 border border-white/10
+             text-gray-400 hover:text-yellow-400 hover:border-yellow-500/30 transition-all"
+  title="Announcements"
+>
+  <FaBullhorn className="text-lg" />
+</motion.button>
                 {/* ✅ LIGHT SUPPORT BUTTON */}
                 <motion.button
                   type="button"
@@ -236,6 +258,77 @@ export default function TopNavbar() {
           </>
         )}
       </AnimatePresence>
+      <AnimatePresence>
+  {announceOpen && (
+    <>
+      <motion.button
+        type="button"
+        onClick={() => setAnnounceOpen(false)}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
+      />
+
+      <motion.aside
+        initial={{ x: "110%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "110%" }}
+        transition={{ type: "spring", stiffness: 260, damping: 28 }}
+        className="fixed top-0 right-0 z-50 w-[92%] max-w-md h-full bg-[#050a14]
+                   border-l border-yellow-500/20 shadow-2xl"
+      >
+        {/* Header */}
+        <div className="h-16 px-4 flex items-center justify-between border-b border-gray-800/70">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center">
+              <FaBullhorn className="text-yellow-400" />
+            </div>
+            <div>
+              <div className="text-sm font-black text-white">Announcements</div>
+              <div className="text-[11px] text-gray-500">Latest updates</div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setAnnounceOpen(false)}
+            className="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 text-gray-300
+                       hover:text-yellow-300 hover:border-yellow-500/30 transition flex items-center justify-center"
+            title="Close"
+          >
+            <FaTimes />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="p-4 h-[calc(100%-64px)] overflow-y-auto custom-scrollbar space-y-3">
+          {publicAnnouncementsLoading ? (
+            <div className="text-gray-400">Loading...</div>
+          ) : publicAnnouncements?.length ? (
+            publicAnnouncements.map((a) => (
+              <div
+                key={a._id}
+                className="rounded-3xl bg-black/30 border border-yellow-500/15 p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-sm font-black text-white">{a.title}</h3>
+                  <span className="text-[10px] text-gray-500 whitespace-nowrap">
+                    {a.createdAt ? new Date(a.createdAt).toLocaleDateString() : ""}
+                  </span>
+                </div>
+                <p className="text-[13px] text-gray-300 mt-2 leading-relaxed">
+                  {a.description}
+                </p>
+              </div>
+            ))
+          ) : (
+            <div className="text-gray-400">No announcements yet.</div>
+          )}
+        </div>
+      </motion.aside>
+    </>
+  )}
+</AnimatePresence>
     </>
   );
 }

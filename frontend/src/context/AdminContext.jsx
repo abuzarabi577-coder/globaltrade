@@ -27,7 +27,8 @@ const [withdraws, setWithdraws] = useState([]);
    const [adminUser, setAdminUser] = useState(null);
 
   const [alert, setAlert] = useState({ isOpen: false, type: '', message: '' });
-  
+  const [announcements, setAnnouncements] = useState([]);
+const [announcementsLoading, setAnnouncementsLoading] = useState(false);
   const showAlert = (type, message) => {
     setAlert({ isOpen: true, type, message });
     setTimeout(() => setAlert({ isOpen: false, type: '', message: '' }), 2000);
@@ -305,6 +306,85 @@ const toggleUserStatus = useCallback(async (userId, currentStatus) => {
     setAdminLoading(false);
   }
 }, [fetchUsers]);
+
+
+const fetchAnnouncements = useCallback(async () => {
+  try {
+    setAnnouncementsLoading(true);
+
+    const res = await fetch(`${backendURL}/api/admin/`, {
+      method: "GET",
+      credentials: "include",
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data?.success) throw new Error(data?.message || "Failed to fetch announcements");
+
+    setAnnouncements(Array.isArray(data.list) ? data.list : []);
+    return data.list || [];
+  } catch (e) {
+    setAnnouncements([]);
+    showAlert("error", e?.message || "Failed to fetch announcements");
+    return [];
+  } finally {
+    setAnnouncementsLoading(false);
+  }
+}, [showAlert]);
+
+const createAnnouncement = useCallback(async (payload) => {
+  try {
+    setAdminLoading(true);
+
+    const res = await fetch(`${backendURL}/api/admin/`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data?.success) throw new Error(data?.message || "Create failed");
+
+    showAlert("success", "Announcement added");
+    await fetchAnnouncements();
+    return true;
+  } catch (e) {
+    showAlert("error", e?.message || "Create failed");
+    return false;
+  } finally {
+    setAdminLoading(false);
+  }
+}, [fetchAnnouncements, showAlert]);
+
+const deleteAnnouncement = useCallback(async (id) => {
+  if (!id) return false;
+  try {
+    setAdminLoading(true);
+
+    const res = await fetch(`${backendURL}/api/admin/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data?.success) throw new Error(data?.message || "Delete failed");
+
+    showAlert("success", "Announcement deleted");
+    await fetchAnnouncements();
+    return true;
+  } catch (e) {
+    showAlert("error", e?.message || "Delete failed");
+    return false;
+  } finally {
+    setAdminLoading(false);
+  }
+}, [fetchAnnouncements, showAlert]);
+
+
+
+
+
+
   const value = useMemo(
     () => ({
       // users
@@ -326,7 +406,11 @@ fetchWithdrawRequests, approveWithdrawRequest, rejectWithdrawRequest,withdraws,
       fetchLeaderboard,createDummyUser,adminUser,
 checkAdminSession,
 loginAdmin,
-logoutAdmin,toggleUserStatus
+logoutAdmin,toggleUserStatus,announcements,
+announcementsLoading,
+fetchAnnouncements,
+createAnnouncement,
+deleteAnnouncement,
 
     }),
     [
@@ -340,7 +424,7 @@ logoutAdmin,toggleUserStatus
       adminLoading,
       leaderboardUsers,
       leaderboardError,
-      fetchLeaderboard,showAlert,alert
+      fetchLeaderboard,showAlert,alert,
     ]
   );
 

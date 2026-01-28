@@ -14,7 +14,7 @@ export const useAppContext = () => {
 
 export const AppcontextProvider = ({ children }) => {
   const navigate = useNavigate();
-  const backendURL = process.env.REACT_APP_BACKEND_URL || 'https://api.1cglobal.cc';
+  const backendURL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
   
   const [FetchAdminTasks, setFetchAdminTasks] = useState([]); // idle, loading, success, error
   const [FetchUserTask, setFetchUserTask] = useState([]); // idle, loading, success, error
@@ -29,7 +29,11 @@ const [withdrawHistory, setWithdrawHistory] = useState([]);
     setAlert({ isOpen: true, type, message });
     setTimeout(() => setAlert({ isOpen: false, type: '', message: '' }), 2000);
   };
-
+const [publicLeaderboard, setPublicLeaderboard] = useState([]);
+const [publicLeaderboardLoading, setPublicLeaderboardLoading] = useState(false);
+const [publicLeaderboardError, setPublicLeaderboardError] = useState("");
+const [publicAnnouncements, setPublicAnnouncements] = useState([]);
+const [publicAnnouncementsLoading, setPublicAnnouncementsLoading] = useState(false);
   // ✅ FIXED: Tasks IDs ONLY (No points)
   const syncTasksToBackend = async (taskIds) => {
     setloading(true)
@@ -345,6 +349,7 @@ const createWithdraw = async (amount) => {
     const res = await fetch(`${backendURL}/api/user/withdraw/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      "x-user-tz": Intl.DateTimeFormat().resolvedOptions().timeZone, // ✅ add this
       credentials: "include",
       body: JSON.stringify({ amount }),
     });
@@ -446,6 +451,57 @@ const handleRefreshStatus = async (withdrawId) => {
     setloading(false); 
   }
 };
+
+const fetchPublicLeaderboard = useCallback(async (limit = 10) => {
+  try {
+    setPublicLeaderboardLoading(true);
+    setPublicLeaderboardError("");
+
+    const res = await fetch(`${backendURL}/api/user/leaderboard/top?limit=${limit}`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data?.success) {
+      throw new Error(data?.message || "Failed to fetch public leaderboard");
+    }
+
+    setPublicLeaderboard(Array.isArray(data.users) ? data.users : []);
+    return data.users || [];
+  } catch (e) {
+    setPublicLeaderboard([]);
+    setPublicLeaderboardError(e.message || "Error");
+    return [];
+  } finally {
+    setPublicLeaderboardLoading(false);
+  }
+}, [backendURL]);
+
+const fetchPublicAnnouncements = useCallback(async () => {
+  try {
+    setPublicAnnouncementsLoading(true);
+
+    const res = await fetch(`${backendURL}/api/user/fetch-annocuments`, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data?.success) {
+      throw new Error(data?.message || "Failed to fetch announcements");
+    }
+
+    setPublicAnnouncements(Array.isArray(data.list) ? data.list : []);
+    return data.list || [];
+  } catch (e) {
+    setPublicAnnouncements([]);
+    return [];
+  } finally {
+    setPublicAnnouncementsLoading(false);
+  }
+}, [backendURL]);
   return (
     <AppContext.Provider value={{
       syncTasksToBackend,    // ✅ Main function
@@ -454,6 +510,14 @@ const handleRefreshStatus = async (withdrawId) => {
       HandleFetchAdminTasks,FetchAdminTasks,loading, setloading,
       updateAdminTask,deleteAdminTask,HandleFetchUserTasks,FetchUserTask,fetchTodayTaskStatus,FetchUserData,HandleFetchUserData,HandleCreateInvestmentPlan
       ,loading,PaymentINV,fetchLatestInvoice,createWithdraw,fetchWithdrawHistory,withdrawHistory,checkInvoiceStatus,handleRefreshStatus
+,
+      publicLeaderboard,
+publicLeaderboardLoading,
+publicLeaderboardError,
+fetchPublicLeaderboard,publicAnnouncements,
+publicAnnouncementsLoading,
+fetchPublicAnnouncements,
+
     }}>
       {children}
     </AppContext.Provider>

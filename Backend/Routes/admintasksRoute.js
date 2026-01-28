@@ -10,6 +10,7 @@ import { adminApproveWithdraw, adminFetchWithdraws, adminRejectWithdraw } from '
 import authMiddleware from '../Midleware/authMiddleware.js';
 import { adminCreateUser } from '../Admincontroller/createDummyUSer.js';
 import { toggleUserStatus } from '../Admincontroller/userStatusController.js';
+import { listAnnouncements,deleteAnnouncement,createAnnouncement } from '../Admincontroller/announcement.admin.controller.js';
 
 const router = express.Router();
 
@@ -40,5 +41,7 @@ router.post("/dummyusers/create", adminCreateUser);
 router.patch("/users/:id/toggle-status", toggleUserStatus);
 // GET /api/admin/users?q=&page=&limit=
 // router.get("/users", adminGetUsers);
-
+router.get("/", listAnnouncements);
+router.post("/", createAnnouncement);
+router.delete("/:id", deleteAnnouncement);
 export default router;
