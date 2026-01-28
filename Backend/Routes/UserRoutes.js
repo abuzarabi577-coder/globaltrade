@@ -10,7 +10,7 @@ import { createWithdrawRequest } from '../controller/withdraw.controller.js';
 import { getMyWithdrawHistory } from '../controller/withdrawhistory.controller.js';
 import { requestResetOtp } from '../controller/auth.forgot.controller.js';
 import { checkUserWithdrawStatus } from '../controller/withdrawCheckBYUser.js';
-import { getPublicTopRankers } from '../controller/publicLeaderboard.controller.js';
+import { getPublicTopRankers } from '../controller/publicleaderboard.js';
 import { listAnnouncements } from '../Admincontroller/announcement.admin.controller.js';
 
 const router = express.Router();
