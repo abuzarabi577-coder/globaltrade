@@ -75,40 +75,45 @@ const AdminLayout = () => {
     </>
   );
 
-  const renderContent = () => {
-    if (location.pathname.includes('tasksmanage')) return <TasksManager />;
-    if (location.pathname.includes('users')) return <AdminUsers />;
-    if (location.pathname.includes('leaderboard')) return <Leaderboard />;
-    if (location.pathname.includes('withdraws')) return <AdminWithdraws />;
-        if (location.pathname.includes('announcements')) return <AdminAnnouncements />;
+ const renderContent = () => {
+  if (location.pathname.includes('tasksmanage')) return <TasksManager />;
+  if (location.pathname.includes('users')) return <AdminUsers />;
+  if (location.pathname.includes('leaderboard')) return <Leaderboard />;
+  if (location.pathname.includes('withdraws')) return <AdminWithdraws />;
+  if (location.pathname.includes('announcements')) return <AdminAnnouncements />;
 
+  // ✅ DASHBOARD (CARDS HERE)
+  if (location.pathname.includes('dashboard')) {
     return (
-      <div className="pt-20">
-        <h1 className="text-4xl font-black text-yellow-400">Admin Dashboard</h1>
-        <p className="text-gray-400 mt-2">Welcome to 1C Trader Admin Panel</p>
+      <div>
+        <h1 className="text-4xl font-black text-yellow-400">
+          Admin Dashboard
+        </h1>
+        <p className="text-gray-400 mt-2">
+          Welcome to 1C Trader Admin Panel
+        </p>
 
-        {/* ================= CARDS ================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-6">
-          {sidebarItems.map((item) => {
-            const isActive = location.pathname.includes(item.id);
-            return (
-              <motion.div
-                key={item.id}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className={`cursor-pointer rounded-2xl p-6 flex flex-col items-center justify-center transition
-                  ${isActive ? 'bg-yellow-500/30 text-white shadow-lg' : 'bg-black/50 text-gray-300 hover:bg-yellow-500/10'}`}
-                onClick={() => navigate(item.path)}
-              >
-                <item.icon className="text-3xl mb-3" />
-                <span className="font-bold">{item.label}</span>
-              </motion.div>
-            );
-          })}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-8">
+          {sidebarItems.map((item) => (
+            <motion.div
+              key={item.id}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate(item.path)}
+              className="cursor-pointer rounded-2xl p-6 flex flex-col items-center justify-center
+                         bg-black/50 text-gray-300 hover:bg-yellow-500/20 transition"
+            >
+              <item.icon className="text-3xl mb-3 text-yellow-400" />
+              <span className="font-bold">{item.label}</span>
+            </motion.div>
+          ))}
         </div>
       </div>
     );
-  };
+  }
+
+  return null;
+};
 
   return (
     <>

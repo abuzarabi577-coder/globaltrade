@@ -105,6 +105,10 @@ export default function TopNavbar() {
     if (latestId) setSeen(latestId);
     setAnnouncePopupOpen(false);
   };
+useEffect(() => {
+  document.body.style.overflow = mobileOpen ? "hidden" : "";
+  return () => (document.body.style.overflow = "");
+}, [mobileOpen]);
 
   // ✅ Open sidebar (manual)
   const openAnnouncementSidebar = async () => {
@@ -153,11 +157,14 @@ export default function TopNavbar() {
   return (
     <>
       {/* TOP NAVBAR */}
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className="top-0 left-0 right-0 h-16 bg-gradient-to-r from-black/90 via-slate-900/90 to-black/90 backdrop-blur-xl border-b border-yellow-500/20 z-50"
-      >
+     <motion.nav
+  initial={{ y: -100 }}
+  animate={{ y: 0 }}
+  className=" top-0 left-0 right-0 h-16
+             bg-gradient-to-r from-black/90 via-slate-900/90 to-black/90
+             backdrop-blur-xl border-b border-yellow-500/20 z-[100]"
+>
+
         <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
           {/* LEFT */}
           <div className="flex items-center gap-8">
@@ -256,7 +263,7 @@ export default function TopNavbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+className="fixed inset-0 z-[998] bg-black/60 backdrop-blur-sm md:hidden"
             />
 
             {/* Panel */}
@@ -266,13 +273,14 @@ export default function TopNavbar() {
               animate={{ x: 0 }}
               exit={{ x: "110%" }}
               transition={{ type: "spring", stiffness: 260, damping: 28 }}
-              className="
-                fixed top-0 right-0 z-50 md:hidden
-                w-[86%] max-w-sm h-full
-                bg-gradient-to-b from-[#050a14] via-black to-[#050a14]
-                border-l border-yellow-500/20
-                shadow-2xl
-              "
+             className="
+  fixed top-0 right-0 z-[999] md:hidden
+  w-[86%] max-w-sm h-full
+  bg-gradient-to-b from-[#050a14] via-black to-[#050a14]
+  border-l border-yellow-500/20
+  shadow-2xl
+"
+
             >
               {/* Header */}
               <div className="h-16 px-4 flex items-center justify-between border-b border-gray-800/70">
