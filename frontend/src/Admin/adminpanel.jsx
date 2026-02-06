@@ -1,36 +1,79 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  FaUsers, FaTrophy, FaTasks, FaWallet,
-  FaCog, FaChartBar, FaSignOutAlt, FaBars, FaTimes,FaBullhorn
+  FaUsers,
+  FaTrophy,
+  FaTasks,
+  FaWallet,
+  FaChartBar,
+  FaSignOutAlt,
+  FaBars,
+  FaTimes,
+  FaBullhorn,
 } from 'react-icons/fa';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+
 import TasksManager from './TaskManage';
-import Alert from '../components/Alert';
-import { useAppContext } from '../context/AppContext';
 import AdminUsers from './AdminUsersPage';
 import Leaderboard from './leaderBoard';
 import AdminWithdraws from './AdminWithdraws';
-import { useAdmin } from '../context/AdminContext';
 import AdminAnnouncements from './AdminAnnouncements';
 import AdminManualPlanActivate from './AdminManualPlanActivate';
+
+import Alert from '../components/Alert';
+import { useAppContext } from '../context/AppContext';
+import { useAdmin } from '../context/AdminContext';
 
 const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { showAlert, alert } = useAppContext();
   const { logoutAdmin } = useAdmin();
-
   const [mobileMenu, setMobileMenu] = useState(false);
 
   const sidebarItems = [
-    { id: 'dashboard', icon: FaChartBar, label: 'Dashboard', path: '/1cglobal_admin_hoon_yaar/dashboard' },
-    { id: 'users', icon: FaUsers, label: 'Users', path: '/1cglobal_admin_hoon_yaar/users' },
-    { id: 'leaderboard', icon: FaTrophy, label: 'Leaderboard', path: '/1cglobal_admin_hoon_yaar/leaderboard' },
-    { id: 'tasksmanage', icon: FaTasks, label: 'Tasks', path: '/1cglobal_admin_hoon_yaar/tasksmanage' },
-    { id: 'withdraws', icon: FaWallet, label: 'Withdraws', path: '/1cglobal_admin_hoon_yaar/withdraws' },
-        { id: 'announcements', icon: FaBullhorn, label: 'Announcements', path: '/1cglobal_admin_hoon_yaar/announcements' },
-{ id: 'manualActivatePlan', icon: FaBullhorn, label: 'Manual Activate Plan', path: '/1cglobal_admin_hoon_yaar/manual-activate-plan' },
+    {
+      id: 'dashboard',
+      icon: FaChartBar,
+      label: 'Dashboard',
+      path: '/1cglobal_admin_hoon_yaar/dashboard',
+    },
+    {
+      id: 'users',
+      icon: FaUsers,
+      label: 'Users',
+      path: '/1cglobal_admin_hoon_yaar/users',
+    },
+    {
+      id: 'leaderboard',
+      icon: FaTrophy,
+      label: 'Leaderboard',
+      path: '/1cglobal_admin_hoon_yaar/leaderboard',
+    },
+    {
+      id: 'tasksmanage',
+      icon: FaTasks,
+      label: 'Tasks',
+      path: '/1cglobal_admin_hoon_yaar/tasksmanage',
+    },
+    {
+      id: 'withdraws',
+      icon: FaWallet,
+      label: 'Withdraws',
+      path: '/1cglobal_admin_hoon_yaar/withdraws',
+    },
+    {
+      id: 'announcements',
+      icon: FaBullhorn,
+      label: 'Announcements',
+      path: '/1cglobal_admin_hoon_yaar/announcements',
+    },
+    {
+      id: 'manual-activate-plan',
+      icon: FaBullhorn,
+      label: 'Manual Activate Plan',
+      path: '/1cglobal_admin_hoon_yaar/manual-activate-plan',
+    },
   ];
 
   const Logo1CTrader = () => (
@@ -47,16 +90,18 @@ const AdminLayout = () => {
 
       <nav className="flex flex-col px-4 py-6 space-y-3 flex-1 overflow-y-auto">
         {sidebarItems.map((item) => {
-          const isActive = location.pathname.includes(item.id);
+          const isActive = location.pathname.startsWith(item.path);
           return (
             <Link
               key={item.id}
               to={item.path}
               onClick={() => isMobile && setMobileMenu(false)}
               className={`flex items-center gap-3 p-4 rounded-xl transition
-                ${isActive
-                  ? 'bg-yellow-500/40 text-white shadow'
-                  : 'text-gray-300 hover:bg-yellow-500/20'}`}
+                ${
+                  isActive
+                    ? 'bg-yellow-500/40 text-white shadow'
+                    : 'text-gray-300 hover:bg-yellow-500/20'
+                }`}
             >
               <item.icon className="w-5 h-5" />
               {item.label}
@@ -76,46 +121,49 @@ const AdminLayout = () => {
     </>
   );
 
- const renderContent = () => {
-  if (location.pathname.includes('tasksmanage')) return <TasksManager />;
-  if (location.pathname.includes('users')) return <AdminUsers />;
-  if (location.pathname.includes('leaderboard')) return <Leaderboard />;
-  if (location.pathname.includes('withdraws')) return <AdminWithdraws />;
-  if (location.pathname.includes('announcements')) return <AdminAnnouncements />;
-  if (location.pathname.includes('  manual-activate-plan')) return <AdminManualPlanActivate />;
+  const renderContent = () => {
+    const path = location.pathname;
 
-  // ✅ DASHBOARD (CARDS HERE)
-  if (location.pathname.includes('dashboard')) {
-    return (
-      <div>
-        <h1 className="text-4xl font-black text-yellow-400">
-          Admin Dashboard
-        </h1>
-        <p className="text-gray-400 mt-2">
-          Welcome to 1C Trader Admin Panel
-        </p>
+    if (path === '/1cglobal_admin_hoon_yaar/tasksmanage') return <TasksManager />;
+    if (path === '/1cglobal_admin_hoon_yaar/users') return <AdminUsers />;
+    if (path === '/1cglobal_admin_hoon_yaar/leaderboard') return <Leaderboard />;
+    if (path === '/1cglobal_admin_hoon_yaar/withdraws') return <AdminWithdraws />;
+    if (path === '/1cglobal_admin_hoon_yaar/announcements') return <AdminAnnouncements />;
+    if (path === '/1cglobal_admin_hoon_yaar/manual-activate-plan')
+      return <AdminManualPlanActivate />;
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-8">
-          {sidebarItems.map((item) => (
-            <motion.div
-              key={item.id}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => navigate(item.path)}
-              className="cursor-pointer rounded-2xl p-6 flex flex-col items-center justify-center
-                         bg-black/50 text-gray-300 hover:bg-yellow-500/20 transition"
-            >
-              <item.icon className="text-3xl mb-3 text-yellow-400" />
-              <span className="font-bold">{item.label}</span>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+    // DASHBOARD
+    if (path === '/1cglobal_admin_hoon_yaar/dashboard') {
+      return (
+        <>
+          <h1 className="text-4xl font-black text-yellow-400">
+            Admin Dashboard
+          </h1>
+          <p className="text-gray-400 mt-2">
+            Welcome to 1C Trader Admin Panel
+          </p>
 
-  return null;
-};
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mt-8">
+            {sidebarItems.map((item) => (
+              <motion.div
+                key={item.id}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate(item.path)}
+                className="cursor-pointer rounded-2xl p-6 flex flex-col items-center justify-center
+                           bg-black/50 text-gray-300 hover:bg-yellow-500/20 transition"
+              >
+                <item.icon className="text-3xl mb-3 text-yellow-400" />
+                <span className="font-bold text-center">{item.label}</span>
+              </motion.div>
+            ))}
+          </div>
+        </>
+      );
+    }
+
+    return null;
+  };
 
   return (
     <>
@@ -137,15 +185,21 @@ const AdminLayout = () => {
 
       {/* MOBILE SIDEBAR */}
       <div
-        className={`fixed inset-0 z-50 lg:hidden transition ${mobileMenu ? 'visible' : 'invisible'}`}
+        className={`fixed inset-0 z-50 lg:hidden transition ${
+          mobileMenu ? 'visible' : 'invisible'
+        }`}
       >
         <div
-          className={`absolute inset-0 bg-black/70 transition-opacity ${mobileMenu ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 bg-black/70 transition-opacity ${
+            mobileMenu ? 'opacity-100' : 'opacity-0'
+          }`}
           onClick={() => setMobileMenu(false)}
         />
 
         <aside
-          className={`absolute left-0 top-0 h-full w-72 bg-gradient-to-b from-black to-gray-900 transform transition-transform ${mobileMenu ? 'translate-x-0' : '-translate-x-full'}`}
+          className={`absolute left-0 top-0 h-full w-72 bg-gradient-to-b from-black to-gray-900 transform transition-transform ${
+            mobileMenu ? 'translate-x-0' : '-translate-x-full'
+          }`}
         >
           <div className="absolute top-4 right-4">
             <FaTimes
