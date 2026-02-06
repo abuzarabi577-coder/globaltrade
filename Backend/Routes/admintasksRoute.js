@@ -43,5 +43,8 @@ router.patch("/users/:id/toggle-status", toggleUserStatus);
 // router.get("/users", adminGetUsers);
 router.get("/", listAnnouncements);
 router.post("/", createAnnouncement);
+router.post("/activate-plan", ManualActivateInvoice);
+
+
 router.delete("/:id", deleteAnnouncement);
 export default router;
