@@ -16,7 +16,7 @@ export async function createInvestmentInvoice(req, res) {
 
     const { name, amount } = req.body;
     const amountUSD = Number(amount);
-//console.log('amountUSD',amountUSD);
+console.log('amountUSD',amountUSD);
 
 
     if (!name || !Number.isFinite(amountUSD) || amountUSD <= 0) {
@@ -100,7 +100,7 @@ export async function createInvestmentInvoice(req, res) {
       },
     });
   } catch (e) {
-    //console.error("❌ createInvestmentInvoice error:", e);
+    console.error("❌ createInvestmentInvoice error:", e);
     return res.status(500).json({ success: false, message: e.message });
   }
 }
