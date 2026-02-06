@@ -11,7 +11,7 @@ import authMiddleware from '../Midleware/authMiddleware.js';
 import { adminCreateUser } from '../Admincontroller/createDummyUSer.js';
 import { toggleUserStatus } from '../Admincontroller/userStatusController.js';
 import { listAnnouncements,deleteAnnouncement,createAnnouncement } from '../Admincontroller/announcement.admin.controller.js';
-import { ManualActivateInvoice } from '../Admincontroller/AdminActivatePlam.js';
+import { ManualActivateInvoice } from '../Admincontroller/AdminActivatePlan.js';
 
 const router = express.Router();
 

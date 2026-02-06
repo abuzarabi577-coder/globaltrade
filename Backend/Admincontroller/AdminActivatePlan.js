@@ -3,7 +3,7 @@ import User from "../DBModels/UserProfile.js";
 import InvestmentInvoice from "../DBModels/InvestmentInvoice.js";
 import { activatePlanFromInvoice } from "./InvestmentPlanSaveController.js";
 
-export async function manualActivateInvoice(req, res) {
+export async function ManualActivateInvoice(req, res) {
   try {
 
     const { invoiceId } = req.body;
