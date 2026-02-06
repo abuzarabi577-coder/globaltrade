@@ -11,7 +11,7 @@ import authMiddleware from '../Midleware/authMiddleware.js';
 import { adminCreateUser } from '../Admincontroller/createDummyUSer.js';
 import { toggleUserStatus } from '../Admincontroller/userStatusController.js';
 import { listAnnouncements,deleteAnnouncement,createAnnouncement } from '../Admincontroller/announcement.admin.controller.js';
-import { ManualActivateInvoice } from '../Admincontroller/AdminActivatePlan.js';
+import { manualActivatePlan } from '../Admincontroller/AdminActivatePlan.js';
 
 const router = express.Router();
 
@@ -44,7 +44,7 @@ router.patch("/users/:id/toggle-status", toggleUserStatus);
 // router.get("/users", adminGetUsers);
 router.get("/", listAnnouncements);
 router.post("/", createAnnouncement);
-router.post("/activate-plan", ManualActivateInvoice);
+router.post("/manual-activate-plan", manualActivatePlan);
 
 
 router.delete("/:id", deleteAnnouncement);

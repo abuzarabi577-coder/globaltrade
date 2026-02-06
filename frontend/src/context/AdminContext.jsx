@@ -383,7 +383,28 @@ const deleteAnnouncement = useCallback(async (id) => {
 
 
 
+const manualActivatePlan = async (payload) => {
+  try {
+    const res = await fetch(`${backendURL}/api/admin/manual-activate-plan`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
 
+    const data = await res.json();
+    if (!data?.success) {
+      showAlert({  type: "error", message: data?.message || "Failed" });
+      return false;
+    }
+
+    showAlert({ type: "success", message: data.message });
+    return true;
+  } catch (e) {
+    showAlert({  type: "error", message: e.message });
+    return false;
+  }
+};
 
   const value = useMemo(
     () => ({
@@ -411,7 +432,7 @@ announcementsLoading,
 fetchAnnouncements,
 createAnnouncement,
 deleteAnnouncement,
-
+manualActivatePlan
     }),
     [
       users,

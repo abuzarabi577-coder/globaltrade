@@ -32,13 +32,13 @@ async function payramRequest(method, path, body) {
     const status = err?.response?.status;
     const data = err?.response?.data;
 
-    //console.error("❌ PayRam Request Failed:", {
-    //   url: `${PAYRAM_BASE_URL}${path}`,
-    //   method,
-    //   body,
-    //   status,
-    //   data,
-    // });
+    console.error("❌ PayRam Request Failed:", {
+      url: `${PAYRAM_BASE_URL}${path}`,
+      method,
+      body,
+      status,
+      data,
+    });
 
    throw new Error(
   data?.error?.message ||

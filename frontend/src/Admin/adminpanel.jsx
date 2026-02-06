@@ -13,6 +13,7 @@ import Leaderboard from './leaderBoard';
 import AdminWithdraws from './AdminWithdraws';
 import { useAdmin } from '../context/AdminContext';
 import AdminAnnouncements from './AdminAnnouncements';
+import AdminManualPlanActivate from './AdminManualPlanActivate';
 
 const AdminLayout = () => {
   const location = useLocation();
@@ -28,13 +29,13 @@ const AdminLayout = () => {
     { id: 'leaderboard', icon: FaTrophy, label: 'Leaderboard', path: '/1cglobal_admin_hoon_yaar/leaderboard' },
     { id: 'tasksmanage', icon: FaTasks, label: 'Tasks', path: '/1cglobal_admin_hoon_yaar/tasksmanage' },
     { id: 'withdraws', icon: FaWallet, label: 'Withdraws', path: '/1cglobal_admin_hoon_yaar/withdraws' },
-        { id: 'announcements', icon: FaWallet, label: 'Announcements', path: '/1cglobal_admin_hoon_yaar/announcements' },
-
+        { id: 'announcements', icon: FaBullhorn, label: 'Announcements', path: '/1cglobal_admin_hoon_yaar/announcements' },
+{ id: 'manualActivatePlan', icon: FaBullhorn, label: 'Manual Activate Plan', path: '/1cglobal_admin_hoon_yaar/manual-activate-plan' },
   ];
 
   const Logo1CTrader = () => (
     <div className="text-yellow-400 font-black text-2xl tracking-wide">
-      1C <span className="text-white">TRADER</span>
+      1C Global <span className="text-white">TRADER</span>
     </div>
   );
 
@@ -81,6 +82,7 @@ const AdminLayout = () => {
   if (location.pathname.includes('leaderboard')) return <Leaderboard />;
   if (location.pathname.includes('withdraws')) return <AdminWithdraws />;
   if (location.pathname.includes('announcements')) return <AdminAnnouncements />;
+  if (location.pathname.includes('  manual-activate-plan')) return <AdminManualPlanActivate />;
 
   // ✅ DASHBOARD (CARDS HERE)
   if (location.pathname.includes('dashboard')) {
