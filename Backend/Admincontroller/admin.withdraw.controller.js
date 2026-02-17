@@ -25,8 +25,18 @@ export async function adminApproveWithdraw(req, res) {
     const { id } = req.params;
 
     // 1) Load request
-    const wr = await WithdrawRequest.findById(id);
-    if (!wr) return res.status(404).json({ success: false, message: "Withdraw not found" });
+const wr = await WithdrawRequest.findOneAndUpdate(
+  { _id: id, status: "pending" },   // ✅ only update if still pending
+  { status: "processing" },          // lock request
+  { new: true }
+);
+   
+if (!wr) {
+  return res.status(400).json({ 
+    success: false, 
+    message: "Cannot approve: Already processed or not found" 
+  });
+}
 
     if (wr.status !== "pending") {
       return res.status(400).json({ success: false, message: `Already processed: ${wr.status}` });
@@ -48,21 +58,23 @@ export async function adminApproveWithdraw(req, res) {
     }
 
     // 4) LOCK the request
+    wr.IsApproved=true
     wr.status = "processing";
     await wr.save();
 
-    // 5) PayRam Payload (Docs ke mutabiq fix kiya)
+    // 5) PayRam Payload (Docs ke mutabiq fix kiya)'
  // PayRam ko "ERC20" nahi, "ETH" chahiye
 const payoutPayload = {
   email: String(user.email).trim().toLowerCase(),
-  blockChainCode: user.network === "ERC20" ? "ETH" : (user.network === "TRC20" ? "TRX" : user.network), 
+  blockChainCode: user.network === "ERC20" ? "ETH" :"ETH" , 
   currencyCode: "USDT",
-  amount: String(amount),
+  amount: Number(amount),
   toAddress: user.walletAddress,
   customerID: String(user._id),
 };
 
     const payoutResp = await createPayramWithdrawal(payoutPayload);
+console.log(payoutResp);
 
     // 6) Save PayRam response & Update Status
     wr.status = payoutResp?.status || "pending";

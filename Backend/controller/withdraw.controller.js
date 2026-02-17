@@ -87,6 +87,21 @@ export async function createWithdrawRequest(req, res) {
     const amountUSD = Number(req.body.amount);
     console.log("amountUSD", amountUSD);
 
+// 🔥 Check for existing pending/processing withdraw
+const existingWR = await WithdrawRequest.findOne({
+  userId,
+  status: { $in: ["pending", "processing"] }, // ❌ Existing in-progress request
+});
+
+if (existingWR) {
+  return res.status(400).json({
+    success: false,
+    message: "You already have a withdraw request pending or in processing. Wait until it is completed.",
+
+  });
+}
+
+
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized (missing user)" });
     }

@@ -40,7 +40,7 @@ export default function AdminWithdraws() {
     id: null,
     type: null,
   });
-
+const [loadingId, setLoadingId] = useState(null);
   useEffect(() => {
     fetchWithdrawRequests(status);
   }, [status, fetchWithdrawRequests]);
@@ -50,15 +50,22 @@ export default function AdminWithdraws() {
     showAlert("success", "Wallet address copied");
   };
 
-  const handleAction = async () => {
-    if (showConfirm.type === "approve") {
-      await approveWithdrawRequest(showConfirm.id);
-    } else {
-      await rejectWithdrawRequest(showConfirm.id, "Rejected by admin");
-    }
-    setShowConfirm({ show: false, id: null, type: null });
-  };
+ const handleAction = async () => {
+  const { id, type } = showConfirm;
 
+  setLoadingId(id); // disable buttons for this row
+
+  try {
+    if (type === "approve") {
+      await approveWithdrawRequest(id);
+    } else {
+      await rejectWithdrawRequest(id, "Rejected by admin");
+    }
+  } finally {
+    setLoadingId(null);
+    setShowConfirm({ show: false, id: null, type: null });
+  }
+};
   const filtered = useMemo(() => {
     const s = search.toLowerCase();
     if (!s) return withdraws;
@@ -202,32 +209,43 @@ export default function AdminWithdraws() {
                   <Badge text={w.status} />
                 </div>
 
-                <div className="col-span-2 flex justify-end gap-2">
-                  {(w.status === "pending" || w.status === "failed") && (
-                    <>
-                      <FaCheckCircle
-                        onClick={() =>
-                          setShowConfirm({
-                            show: true,
-                            id: w._id,
-                            type: "approve",
-                          })
-                        }
-                        className="text-emerald-400 cursor-pointer"
-                      />
-                      <FaTimesCircle
-                        onClick={() =>
-                          setShowConfirm({
-                            show: true,
-                            id: w._id,
-                            type: "reject",
-                          })
-                        }
-                        className="text-red-400 cursor-pointer"
-                      />
-                    </>
-                  )}
-                </div>
+               <div className="col-span-2 flex justify-end gap-2">
+  {(w.status === "pending" || w.status === "failed") && (
+    <>
+      <FaCheckCircle
+        onClick={() =>
+          loadingId !== w._id &&
+          setShowConfirm({
+            show: true,
+            id: w._id,
+            type: "approve",
+          })
+        }
+        className={`text-2xl transition-all ${
+          loadingId === w._id
+            ? "text-emerald-300 opacity-40 cursor-not-allowed"
+            : "text-emerald-400 cursor-pointer hover:scale-110"
+        }`}
+      />
+
+      <FaTimesCircle
+        onClick={() =>
+          loadingId !== w._id &&
+          setShowConfirm({
+            show: true,
+            id: w._id,
+            type: "reject",
+          })
+        }
+        className={`text-2xl transition-all ${
+          loadingId === w._id
+            ? "text-red-300 opacity-40 cursor-not-allowed"
+            : "text-red-400 cursor-pointer hover:scale-110"
+        }`}
+      />
+    </>
+  )}
+</div>
               </div>
             );
           })}
@@ -267,30 +285,43 @@ export default function AdminWithdraws() {
 
               {(w.status === "pending" || w.status === "failed") && (
                 <div className="flex gap-3 mt-4">
-                  <button
-                    onClick={() =>
-                      setShowConfirm({
-                        show: true,
-                        id: w._id,
-                        type: "approve",
-                      })
-                    }
-                    className="flex-1 py-2 bg-emerald-500/10 text-emerald-400 rounded-xl"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() =>
-                      setShowConfirm({
-                        show: true,
-                        id: w._id,
-                        type: "reject",
-                      })
-                    }
-                    className="flex-1 py-2 bg-red-500/10 text-red-400 rounded-xl"
-                  >
-                    Reject
-                  </button>
+               <button
+  disabled={loadingId === w._id}
+  onClick={() =>
+    loadingId !== w._id &&
+    setShowConfirm({
+      show: true,
+      id: w._id,
+      type: "approve",
+    })
+  }
+  className={`flex-1 py-2 rounded-xl transition-all ${
+    loadingId === w._id
+      ? "bg-emerald-500/5 text-emerald-300 opacity-40 cursor-not-allowed"
+      : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+  }`}
+>
+  Approve
+</button>
+
+<button
+  disabled={loadingId === w._id}
+  onClick={() =>
+    loadingId !== w._id &&
+    setShowConfirm({
+      show: true,
+      id: w._id,
+      type: "reject",
+    })
+  }
+  className={`flex-1 py-2 rounded-xl transition-all ${
+    loadingId === w._id
+      ? "bg-red-500/5 text-red-300 opacity-40 cursor-not-allowed"
+      : "bg-red-500/10 text-red-400 hover:bg-red-500/20"
+  }`}
+>
+  Reject
+</button>
                 </div>
               )}
             </div>

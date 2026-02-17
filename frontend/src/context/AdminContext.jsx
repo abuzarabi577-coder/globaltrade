@@ -164,6 +164,8 @@ const approveWithdrawRequest = useCallback(async (id) => {
   } catch (e) {
     return false;
   } finally {
+        fetchWithdrawRequests("pending");
+
     setAdminLoading(false);
   }
 }, [fetchWithdrawRequests]);

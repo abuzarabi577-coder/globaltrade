@@ -29,7 +29,7 @@ amountUSD: { type: Number },                 // 90 (Add this line)
   ],      default: "pending",
       index: true,
     },
-
+IsApproved:{ type: Boolean, default: false },
     // admin fields
     adminId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
     adminNote: { type: String, default: "" },
