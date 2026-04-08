@@ -19,8 +19,7 @@ import { useAuth } from "../context/AuthContext";
 import { useAppContext } from "../context/AppContext";
 import Alert from "./Alert";
 import InvestPlanCards from "./InvestPlanCards";
-import WinnerAnnouncementModal from "./winnerModal";
-import UnderMaintenanceModal from "./maintainceModal";
+import WinnerAnnouncementModal from "./WinnerAnnouncementModal";
 
 export default function Dashboard() {
   const [activeNav, setActiveNav] = useState("home");
@@ -32,7 +31,7 @@ export default function Dashboard() {
     HandleFetchUserData,} = useAppContext();
 const location = useLocation();
 const isPlansPage = location.pathname === "/plans";
-
+const [isSeized, setIsSeized] = useState(true); // 🔥 TRUE = LOCKED
   const navigate = useNavigate();
   const { logoutUser, checkAuth } = useAuth();
   // ✅ always fetch user on mount (so login state is known)
@@ -144,7 +143,37 @@ const goToPage = async (page) => {
         onClick: () => navigate("/login"),
       },
 ];
+if (isSeized) {
+  return (
+    <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center flex-col text-white">
+      
+      {/* IMAGE */}
+      <img 
+        src='image/sezidNotfy.jpeg'
+        alt="Site Seized"
+        className="w-full h-full object-fit absolute inset-0 opacity-20"
+      />
 
+      {/* OVERLAY TEXT */}
+      <div className="relative z-10 text-center px-6">
+        <h1 className="text-3xl md:text-5xl font-bold text-red-500 mb-6">
+          ⚠️ WEBSITE SEIZED
+        </h1>
+
+        <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed text-black-200">
+          This website has been seized by FIA (Federal Investigation Agency).
+          <br />
+          All operations have been suspended permanently.
+        </p>
+
+        <p className="mt-6 text-sm text-gray-400">
+          Unauthorized access or attempts to bypass this notice may result in legal action.
+        </p>
+      </div>
+
+    </div>
+  );
+}
 
  return (
   <>
@@ -155,14 +184,10 @@ const goToPage = async (page) => {
       isOpen={alert.isOpen}
       onClose={() => showAlert({ isOpen: false, type: "", message: "" })}
     />
-   {/* <UnderMaintenanceModal
-        openByDefault={true}
-        lockSite={true}
-        showClose={true} // close allow
-      /> */}
+
     {/* ✅ TopNavbar ALWAYS visible */}
     <TopNavbar />
-
+  <WinnerAnnouncementModal autoCloseMs={5000} showOncePerSession />
 
     {/* ================= CONTENT ================= */}
 

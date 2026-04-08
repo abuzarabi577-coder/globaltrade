@@ -24,92 +24,73 @@ export async function adminApproveWithdraw(req, res) {
   try {
     const { id } = req.params;
 
-    // 1) Load request
-const wr = await WithdrawRequest.findOneAndUpdate(
+    // Atomic lock
+    const wr = await WithdrawRequest.findOneAndUpdate(
   { _id: id, status: "pending" },   // ✅ only update if still pending
   { status: "processing" },          // lock request
   { new: true }
 );
-   
-if (!wr) {
-  return res.status(400).json({ 
-    success: false, 
-    message: "Cannot approve: Already processed or not found" 
-  });
-}
-
-    if (wr.status !== "pending") {
-      return res.status(400).json({ success: false, message: `Already processed: ${wr.status}` });
+    if (!wr) {
+      return res.status(400).json({
+        success: false,
+        message: "Already processed or not found",
+      });
     }
 
-    // 2) Load user
-    const user = await User.findById(wr.userId); 
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+    const user = await User.findById(wr.userId);
+    if (!user) {
+      wr.status = "failed";
+      await wr.save();
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
 
     if (!user.walletAddress || !user.network) {
-      return res.status(400).json({ success: false, message: "User wallet/network not set" });
+      wr.status = "failed";
+      await wr.save();
+      return res.status(400).json({ success: false, message: "Wallet/network missing" });
     }
 
     const amount = Number(wr.amountUSD);
 
-    // 3) Balance check
     if (Number(user.totalEarnings) < amount) {
-      return res.status(400).json({ success: false, message: "Insufficient user balance" });
+      wr.status = "failed";
+      await wr.save();
+      return res.status(400).json({ success: false, message: "Insufficient balance" });
     }
 
-    // 4) LOCK the request
-    wr.IsApproved=true
-    wr.status = "processing";
-    await wr.save();
-
-    // 5) PayRam Payload (Docs ke mutabiq fix kiya)'
- // PayRam ko "ERC20" nahi, "ETH" chahiye
-const payoutPayload = {
-  email: String(user.email).trim().toLowerCase(),
-  blockChainCode: user.network === "ERC20" ? "ETH" :"ETH" , 
-  currencyCode: "USDT",
-  amount: Number(amount),
-  toAddress: user.walletAddress,
-  customerID: String(user._id),
-};
+    const payoutPayload = {
+      email: String(user.email).trim().toLowerCase(),
+      blockChainCode: "ETH",
+      currencyCode: "USDT",
+      amount,
+      toAddress: user.walletAddress,
+      customerID: String(user._id),
+    };
 
     const payoutResp = await createPayramWithdrawal(payoutPayload);
-console.log(payoutResp);
 
-    // 6) Save PayRam response & Update Status
     wr.status = payoutResp?.status || "pending";
     wr.payramPayoutId = payoutResp?.id || null;
     wr.payramSnapshot = payoutResp;
     await wr.save();
 
-    // 7) Deduct user balance & Update Stats
-    if (payoutResp.status=== 'processed') {
-      user.totalEarnings -= wr.amount;
-      
-      // Safety check: Agar field exist nahi karti to initialize karein
-   
-      user.WithdrwalAmt += amount;
-      await user.save(); // ✅ Fixed syntax
+    if (payoutResp?.status === "processed") {
+      user.totalEarnings -= amount;
+      user.WithdrwalAmt = (user.WithdrwalAmt || 0) + amount;
+      await user.save();
     }
 
     return res.json({
       success: true,
-      message: "Withdraw sent ",
+      message: "Withdraw sent",
       withdraw: wr,
-      payram: payoutResp,
     });
 
   } catch (e) {
-    console.error("CRASH ERROR:", e.message);
-    // Request reset so admin can try again
-    // try {
-    //   await WithdrawRequest.findByIdAndUpdate(req.params.id, { $set: { status: "failed" } });
-    // } catch (_) {}
-
+    console.error("CRASH:", e);
     return res.status(500).json({ success: false, message: e.message });
   }
 }
-
 // ✅ Reject withdraw
 export async function adminRejectWithdraw(req, res) {
   try {

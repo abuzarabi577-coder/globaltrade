@@ -39,22 +39,22 @@ const MAINTENANCE=process.env.REACT_Maintance ==='true'
 )}
      <Routes>
       <Route path="/" element={<Dashboard />} />
-      <Route path="/login" element={<AuthModal />} />
+      {/* <Route path="/login" element={<AuthModal />} />
       <Route path="/investment" element={<InvestmentPage />} />
       <Route path="/coin-game" element={<CoinRainTaskModal />} />
       <Route path="/verify-email" element={<EmailVerification />} />
-<Route path="/plans" element={<Dashboard />} />
- {/* Admin Routes */}
- <Route path="/1cglobal_admin_hoon_yaar/login" element={<AdminLoginPage />} />
-  <Route
+<Route path="/plans" element={<Dashboard />} /> */}
+ {/* Admin Routes. */}
+ {/* <Route path="/1cglobal_admin_hoon_yaar/login" element={<AdminLoginPage />} /> */}
+  {/* <Route
   path="/1cglobal_admin_hoon_yaar/*"
   element={
     <AdminProtectedRoute>
       <AdminLayout />
     </AdminProtectedRoute>
   }
-/>
-    <Route path="/about" element={<AboutUs />} />
+/> */}
+    {/* <Route path="/about" element={<AboutUs />} />
     <Route path="/contact" element={<ContactUs />} />
 
 
@@ -66,7 +66,7 @@ const MAINTENANCE=process.env.REACT_Maintance ==='true'
 
 <Route path="/reset-password" element={<ResetPassword />} />
 
-
+ */}
 
 
     </Routes>
